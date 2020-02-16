@@ -8,6 +8,9 @@ const port = 5000
 
 const usersRouter = require('./routes/api/users')
 
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+
 app.use('/api/users', usersRouter)
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
