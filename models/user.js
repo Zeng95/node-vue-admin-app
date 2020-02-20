@@ -33,27 +33,39 @@ const getUserById = () => {
   User.findById(id, callback)
 }
 
-const getUserByEmail = (data, callback) => {
+const getUserByEmail = (data) => {
   const query = {
     email: data.email
   }
 
-  User
-    .findOne(query)
-    .then(user => {
-      !user ? callback('用户不存在') : callback('用户存在')
-    })
-    .catch(err => {
-      throw err
-    })
+  return new Promise((resolve, reject) => {
+    User
+      .findOne(query)
+      .then(user => {
+        !user ? resolve('用户不存在') : resolve('用户已存在')
+      })
+      .catch(err => reject(err))
+  })
 }
 
-const addUser = (data, callback) => {
-  const newUser = new User(data)
-
-  if (!newUser.password) {
-    callback('密码不能为空')
+const getUserByNameAndEmail = (data) => {
+  const query = {
+    email: data.email,
+    name: data.name
   }
+
+  return new Promise((resolve, reject) => {
+    User
+      .findOne(query)
+      .then(user => {
+        !user ? resolve('用户不存在') : resolve('用户已存在')
+      })
+      .catch(err => reject(err))
+  })
+}
+
+const addUser = (data) => {
+  const newUser = new User(data)
 
   bcrypt.genSalt(10, (err, salt) => {
     bcrypt.hash(newUser.password, salt, (err, hash) => {
@@ -61,16 +73,17 @@ const addUser = (data, callback) => {
 
       newUser.password = hash
 
-      newUser
-        .save()
-        .then(doc => callback(doc))
-        .catch(err => {
-          throw err
-        })
+      return new Promise((resolve, reject) => {
+        newUser
+          .save()
+          .then(user => resolve(user))
+          .catch(err => reject(err))
+      })
     })
   })
 }
 
 module.exports.getUserById = getUserById
 module.exports.getUserByEmail = getUserByEmail
+module.exports.getUserByNameAndEmail = getUserByNameAndEmail
 module.exports.addUser = addUser

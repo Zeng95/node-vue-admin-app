@@ -14,19 +14,19 @@ router.get('/test', (req, res) => {
 // @desc   返回请求的 json 数据
 // @access public
 router.post('/signup', (req, res) => {
-  User.getUserByEmail(req.body, result => {
-    if (result === '用户存在') {
-      res.status(400).json({ email: '邮箱已被注册!' })
-    } else {
-      User.addUser(req.body, result => {
-        if (result === '密码不能为空') {
-          res.status(400).json({ message: result })
-        } else {
-          res.json(result)
-        }
-      })
-    }
-  })
+  User
+    .getUserByNameAndEmail(req.body)
+    .then(result => {
+      if (result === '用户不存在') {
+        User
+          .addUser(req.body)
+          .then(user => res.status(200).json(user))
+          .catch(err => res.status(500).send(err))
+      } else {
+        res.status(400).json({ email: '用户名或者邮箱已被注册!' })
+      }
+    })
+    .catch(err => res.status(500).send(err))
 })
 
 module.exports = router
