@@ -4,13 +4,17 @@
   "description": "A RESTful web api service",
   "main": "app.js",
   "scripts": {
+    "client-install": "npm install --prefix client",
+    "client": "npm start --prefix client",
     "start": "node app.js",
-    "serve": "nodemon app.js"
+    "server": "nodemon app.js",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
   },
   "author": "Leo Zeng",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^3.0.8",
+    "concurrently": "^5.1.0",
     "express": "^4.17.1",
     "gravatar": "^1.8.0",
     "mongoose": "^5.9.1"
