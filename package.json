@@ -1,6 +1,6 @@
 {
-  "name": "vue-bootstrap-admin-backend",
-  "version": "1.0.0",
+  "name": "node-vue-admin-backend",
+  "version": "0.1.0",
   "description": "A RESTful web api service",
   "main": "app.js",
   "scripts": {
