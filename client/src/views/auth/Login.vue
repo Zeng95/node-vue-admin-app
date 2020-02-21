@@ -1,6 +1,6 @@
 <template>
-  <div class="home">
-    初始化页面
+  <div class="login">
+    登录
   </div>
 </template>
 
