@@ -1,0 +1,23 @@
+.text-sm {
+  font-size: 0.875rem;
+}
+
+.text-base {
+  font-size: 1rem;
+}
+
+.text-lg {
+  font-size: 2rem;
+}
+
+.text-black {
+  color: #000;
+}
+
+.text-gray {
+  color: rgb(117, 117, 117);
+}
+
+.border-black {
+  border-color: rgb(34, 34, 34);
+}
