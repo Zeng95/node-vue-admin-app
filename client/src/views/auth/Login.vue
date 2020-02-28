@@ -140,12 +140,9 @@ export default {
       }
     },
     handleLogin() {
-      const { form } = this.$v
-      form.$touch()
+      this.$v.form.$touch()
 
-      if (form.$anyError) {
-        return
-      }
+      if (this.$v.form.$anyError) return false
     }
   }
 }
@@ -175,7 +172,7 @@ export default {
         left: 16px;
       }
       .icon-eye {
-        top: 12px;
+        top: 11px;
         right: 32px;
       }
       input {
