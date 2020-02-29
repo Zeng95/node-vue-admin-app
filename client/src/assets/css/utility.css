@@ -30,6 +30,11 @@
   transform: rotate(180deg);
 }
 
+/* Translate */
+.-translate-x-half {
+  transform: translateX(-50%);
+}
+
 /* Z-Index */
 .z-50 {
   z-index: 50;

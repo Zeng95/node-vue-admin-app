@@ -15,29 +15,17 @@ const getters = {}
 // actions
 const actions = {
   async register({ commit }, data) {
-    try {
-      const response = await auth.register(data)
-      commit('SET_STATUS', true)
-      commit('SET_USER', response.data)
-    } catch (error) {
-      // handle the error here
-    }
+    const response = await auth.register(data)
+    commit('SET_STATUS', true)
+    commit('SET_USER', response.data)
   },
 
   async login({ commit }) {
-    try {
-      commit('SET_STATUS', true)
-    } catch (error) {
-      // handle the error here
-    }
+    commit('SET_STATUS', true)
   },
 
   async logout({ commit }) {
-    try {
-      commit('SET_STATUS', false)
-    } catch (error) {
-      // handle the error here
-    }
+    commit('SET_STATUS', false)
   }
 }
 

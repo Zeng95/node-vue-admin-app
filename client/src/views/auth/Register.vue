@@ -30,18 +30,20 @@
               trim
               size="lg"
               type="text"
-              placeholder="用户名"
               v-model="$v.form.name.$model"
               :state="validateState('name')"
+              :formatter="nameFormatter"
+              placeholder="用户名（不区分大小写）"
               class="text-sm text-black"
             ></b-form-input>
 
             <!-- Feedback -->
-            <b-form-valid-feedback></b-form-valid-feedback>
+            <!-- <b-form-valid-feedback></b-form-valid-feedback> -->
             <b-form-invalid-feedback>
               <span v-if="!$v.form.name.required">用户名不能为空</span>
-              <span v-if="!$v.form.name.minLength">用户名过短</span>
-              <span v-if="!$v.form.name.maxLength">用户名过长</span>
+              <span v-else-if="!$v.form.name.minLength">用户名过短</span>
+              <span v-else-if="!$v.form.name.maxLength">用户名过长</span>
+              <span v-else>用户名已存在</span>
             </b-form-invalid-feedback>
           </b-form-group>
 
@@ -57,7 +59,8 @@
               type="email"
               v-model="$v.form.email.$model"
               :state="validateState('email')"
-              placeholder="邮箱"
+              :formatter="emailFormatter"
+              placeholder="邮箱（不区分大小写）"
               class="text-sm text-black"
             ></b-form-input>
 
@@ -65,7 +68,8 @@
             <b-form-valid-feedback></b-form-valid-feedback>
             <b-form-invalid-feedback>
               <span v-if="!$v.form.email.required">邮箱不能为空</span>
-              <span v-if="!$v.form.email.email">邮箱格式错误</span>
+              <span v-else-if="!$v.form.email.email">邮箱格式错误</span>
+              <span v-else>邮箱已存在</span>
             </b-form-invalid-feedback>
           </b-form-group>
 
@@ -102,7 +106,7 @@
                 <span v-if="!$v.form.pwd.required || !$v.form.pwd.minLength">
                   密码不能小于 6 个字符
                 </span>
-                <span v-if="!$v.form.pwd.maxLength">
+                <span v-else>
                   密码不能大于 16 个字符
                 </span>
               </b-form-invalid-feedback>
@@ -193,6 +197,15 @@
         </div>
       </div>
     </div>
+
+    <b-toast
+      id="my-toast"
+      :variant="toastVariant"
+      title="注册结果"
+      no-auto-hide
+    >
+      {{ toastMessage }}
+    </b-toast>
   </div>
 </template>
 
@@ -213,6 +226,7 @@ import {
   maxLength,
   email
 } from 'vuelidate/lib/validators'
+import auth from '@/api/auth'
 
 export default {
   components: {
@@ -227,13 +241,18 @@ export default {
     return {
       form: {
         name: '',
+        nameAvailable: true,
         email: '',
+        emailAvailable: true,
         pwd: '',
         pwdType: 'password',
         repeatPwd: '',
         identity: '',
         showPwd: false
-      }
+      },
+      showToast: false,
+      toastVariant: '',
+      toastMessage: ''
     }
   },
   validations: {
@@ -263,9 +282,33 @@ export default {
   },
   methods: {
     ...mapActions('auth', ['register']),
+    nameFormatter(value) {
+      const newValue = value.toLowerCase()
+
+      // 校验用户名是否已被注册
+      this.isNameAvailable(newValue)
+
+      return newValue
+    },
+    emailFormatter(value) {
+      const newValue = value.toLowerCase()
+
+      // 校验用户名是否已被注册
+      this.isEmailAvailable(newValue)
+
+      return newValue
+    },
     validateState(name) {
       const { $dirty, $error } = this.$v.form[name]
-      return $dirty ? !$error : null
+      const { nameAvailable, emailAvailable } = this.form
+
+      if (name === 'name' && !nameAvailable) {
+        return nameAvailable
+      } else if (name === 'email' && !emailAvailable) {
+        return emailAvailable
+      } else {
+        return $dirty ? !$error : null
+      }
     },
     togglePwdState() {
       this.form.showPwd = !this.form.showPwd
@@ -276,16 +319,44 @@ export default {
         this.form.pwdType = 'password'
       }
     },
-    handleRegister() {
-      this.$v.form.$touch()
+    async handleRegister() {
+      const { nameAvailable, emailAvailable } = this.form
+      const { form } = this.$v
 
-      if (this.$v.form.$anyError) return false
+      form.$touch()
 
-      this.register({
+      if (form.$anyError || !nameAvailable || !emailAvailable) return false
+      console.log(1)
+      const data = {
         name: this.form.name,
         email: this.form.email,
         password: this.form.pwd
-      })
+      }
+
+      try {
+        await this.register(data)
+        this.$router.push({ name: 'Home' })
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    async isNameAvailable(name) {
+      try {
+        // 发送请求
+        await auth.checkName({ name })
+        this.form.nameAvailable = true
+      } catch (error) {
+        this.form.nameAvailable = false
+      }
+    },
+    async isEmailAvailable(email) {
+      try {
+        // 发送请求
+        await auth.checkEmail({ email })
+        this.form.emailAvailable = true
+      } catch (error) {
+        this.form.emailAvailable = false
+      }
     }
   }
 }
@@ -337,6 +408,11 @@ export default {
       bottom: 14px;
       right: 48px;
     }
+  }
+  .alert-message {
+    top: 20px;
+    left: 50%;
+    width: 380px;
   }
 }
 </style>
