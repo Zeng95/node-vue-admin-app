@@ -35,7 +35,7 @@
             <!-- Feedback -->
             <b-form-valid-feedback></b-form-valid-feedback>
             <b-form-invalid-feedback>
-              <span v-if="!$v.form.username.required">请输入账户</span>
+              <span v-if="!$v.form.username.required">账户不能为空</span>
             </b-form-invalid-feedback>
           </b-form-group>
 
@@ -68,7 +68,7 @@
             <!-- Feedback -->
             <b-form-valid-feedback></b-form-valid-feedback>
             <b-form-invalid-feedback>
-              <span v-if="!$v.form.pwd.required">请输入密码</span>
+              <span v-if="!$v.form.pwd.required">密码不能为空</span>
             </b-form-invalid-feedback>
           </b-form-group>
 
@@ -84,6 +84,28 @@
         </b-form>
       </div>
     </div>
+
+    <b-toast
+      toast-class="rounded-xl"
+      body-class="px-4"
+      :visible="true"
+      :no-auto-hide="true"
+      solid
+    >
+      <template v-slot:toast-title>
+        <div class="d-flex align-items-center">
+          <div class="h4 mb-0 mr-2">
+            <b-icon-bell-fill variant="warning"></b-icon-bell-fill>
+          </div>
+          <strong class="mr-auto text-black">提示</strong>
+        </div>
+      </template>
+      <p class="mb-0 text-dark-gray">
+        目前有两个登陆角色：管理员和普通用户。
+        <br />
+        账号为：admin、user，密码为：123456。
+      </p>
+    </b-toast>
   </div>
 </template>
 
@@ -93,7 +115,8 @@ import {
   BIconEyeFill,
   BIconEyeSlashFill,
   BIconLockFill,
-  BIconPersonFill
+  BIconPersonFill,
+  BIconBellFill
 } from 'bootstrap-vue'
 import { required } from 'vuelidate/lib/validators'
 
@@ -102,7 +125,8 @@ export default {
     BIconEyeFill,
     BIconEyeSlashFill,
     BIconLockFill,
-    BIconPersonFill
+    BIconPersonFill,
+    BIconBellFill
   },
   data() {
     return {
@@ -172,7 +196,7 @@ export default {
         left: 16px;
       }
       .icon-eye {
-        top: 11px;
+        top: 12px;
         right: 32px;
       }
       input {
@@ -185,6 +209,9 @@ export default {
         font-size: 14px;
       }
     }
+  }
+  .toast {
+    color: red;
   }
 }
 </style>

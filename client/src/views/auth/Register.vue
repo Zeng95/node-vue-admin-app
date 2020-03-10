@@ -155,7 +155,7 @@
             <b-form-select
               v-model.trim="$v.form.identity.$model"
               :state="validateState('identity')"
-              class="text-sm text-gray"
+              class="text-sm text-dark-gray"
               :class="{ active: form.identity ? 'active' : '' }"
               size="lg"
             >
@@ -326,7 +326,7 @@ export default {
       form.$touch()
 
       if (form.$anyError || !nameAvailable || !emailAvailable) return false
-      console.log(1)
+
       const data = {
         name: this.form.name,
         email: this.form.email,
@@ -385,7 +385,7 @@ export default {
         left: 16px;
       }
       .icon-eye {
-        top: 11px;
+        top: 12px;
         right: 32px;
       }
       input {

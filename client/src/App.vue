@@ -1,14 +1,11 @@
 <template>
-  <div id="app">
-    <router-view />
+  <div id="app" class="w-100 h-100">
+    <router-view></router-view>
   </div>
 </template>
 
-<style lang="scss">
-html,
-body,
-#app {
-  height: 100%;
-  width: 100%;
+<script>
+export default {
+  name: 'App'
 }
-</style>
+</script>

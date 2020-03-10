@@ -26,7 +26,9 @@ httpClient.interceptors.response.use(
     return response
   },
   error => {
-    return Promise.reject(error)
+    if (error.response) {
+      alert(error.response.data.message)
+    }
   }
 )
 

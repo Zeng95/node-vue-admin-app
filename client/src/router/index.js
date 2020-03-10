@@ -1,8 +1,9 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '@/views/Home'
+import Layout from '@/layout/Index'
 import Login from '@/views/auth/Login'
 import Register from '@/views/auth/Register'
+import Dashboard from '@/views/Dashboard'
 import NotFound from '@/views/404'
 
 Vue.use(VueRouter)
@@ -10,12 +11,16 @@ Vue.use(VueRouter)
 const routes = [
   {
     path: '/',
-    redirect: { name: 'Home' }
-  },
-  {
-    path: '/home',
     name: 'Home',
-    component: Home
+    component: Layout,
+    redirect: { name: 'Dashboard' },
+    children: [
+      {
+        path: '/dashboard',
+        name: 'Dashboard',
+        component: Dashboard
+      }
+    ]
   },
   {
     path: '/login',

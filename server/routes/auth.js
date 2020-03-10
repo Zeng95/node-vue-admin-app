@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt')
 const express = require('express')
 const router = express.Router()
 
-const User = require('../../models/user')
+const User = require('../models/user')
 
 // $route  GET api/auth/login
 // @desc   返回token jwt passport
@@ -61,21 +61,8 @@ router.post('/login', (req, res) => {
 // @desc   返回请求的 json 数据
 // @access public
 router.post('/register', (req, res) => {
-  User.getUserByNameAndEmail(req.body)
-    .then(result => {
-      if (result === '用户不存在') {
-        User.addUser(req.body)
-          .then(user => res.status(200).json(user))
-          .catch(err => res.status(500).send(err))
-      } else {
-        res.status(409).json({
-          timestamp: Date.now(),
-          status: 409,
-          error: 'Conflict',
-          message: '用户名或者邮箱已存在'
-        })
-      }
-    })
+  User.addUser(req.body)
+    .then(user => res.status(200).json(user))
     .catch(err => res.status(500).send(err))
 })
 
@@ -83,6 +70,7 @@ router.post('/register', (req, res) => {
 // @desc   返回请求的 json 数据
 // @access public
 router.post('/register/check/name', (req, res) => {
+  // 查询数据库
   User.getUserByName(req.body)
     .then(result => {
       if (result) {
@@ -105,6 +93,7 @@ router.post('/register/check/name', (req, res) => {
 // @desc   返回请求的 json 数据
 // @access public
 router.post('/register/check/email', (req, res) => {
+  // 查询数据库
   User.getUserByEmail(req.body)
     .then(result => {
       if (result) {

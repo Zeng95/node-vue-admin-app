@@ -8,6 +8,7 @@ import 'mutationobserver-shim'
 import './plugins/bootstrap-vue'
 import './assets/css/custom.css'
 import './assets/css/utility.css'
+import './assets/css/main.css'
 
 Vue.use(Vuelidate)
 Vue.config.productionTip = false

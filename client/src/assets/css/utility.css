@@ -16,13 +16,18 @@
   color: #000;
 }
 
-.text-gray {
-  color: rgb(117, 117, 117);
+.text-dark-gray {
+  color: #757575;
 }
 
 /* Border Color */
 .border-black {
   border-color: rgb(34, 34, 34);
+}
+
+/* Border Radius */
+.rounded-xl {
+  border-radius: 0.5rem;
 }
 
 /* Rotate */
