@@ -1,28 +1,31 @@
-const mongoose = require('mongoose')
-
-const server = 'Leo:db19950723@cluster0-f93qf.mongodb.net' // REPLACE WITH YOUR DB SERVER
-const database = 'adminDB'      // REPLACE WITH YOUR DB NAME
+const { connect } = require('mongoose')
+const { success, error } = require('consola')
 
 class Database {
   constructor() {
     this._connect()
   }
 
-  _connect() {
-    mongoose
-      .connect(
-        `mongodb+srv://${server}/${database}`,
+  async _connect() {
+    try {
+      await connect(
+        `mongodb+srv://${process.env.APP_DB_SERVER}/${process.env.APP_DB_NAME}`,
         {
           useNewUrlParser: true,
           useUnifiedTopology: true
         }
       )
-      .then(() => {
-        console.log('Database connection successful')
+
+      success({
+        message: 'Database connection successful',
+        badge: true
       })
-      .catch(err => {
-        console.error(`Database connection error: ${err}`)
+    } catch (err) {
+      error({
+        message: 'Database connection error',
+        badge: true
       })
+    }
   }
 }
 

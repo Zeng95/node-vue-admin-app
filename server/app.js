@@ -1,11 +1,13 @@
 // 搭建本地服务器
 const express = require('express')
 const cors = require('cors')
-
-require('./database')
+const dotenv = require('dotenv')
 
 const app = express()
 const port = 5000
+
+dotenv.config()
+require('./database')
 
 const authRouter = require('./routes/auth')
 const userRouter = require('./routes/auth')
