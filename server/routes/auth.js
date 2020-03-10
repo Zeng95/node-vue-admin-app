@@ -3,8 +3,9 @@ const express = require('express')
 const router = express.Router()
 
 const User = require('../models/user')
+const controller = require('../controllers/auth')
 
-// $route  GET api/auth/login
+// $route  GET /api/auth/login
 // @desc   返回token jwt passport
 // @access public
 router.post('/login', (req, res) => {
@@ -57,59 +58,19 @@ router.post('/login', (req, res) => {
   }
 })
 
-// $route  POST api/auth/register
+// $route  POST /api/auth/register
 // @desc   返回请求的 json 数据
 // @access public
-router.post('/register', (req, res) => {
-  User.addUser(req.body)
-    .then(user => res.status(200).json(user))
-    .catch(err => res.status(500).send(err))
-})
+router.post('/register', controller.register)
 
 // $route  POST api/auth/register/check/name
 // @desc   返回请求的 json 数据
 // @access public
-router.post('/register/check/name', (req, res) => {
-  // 查询数据库
-  User.getUserByName(req.body)
-    .then(result => {
-      if (result) {
-        // 用户名已存在
-        res.status(409).json({
-          timestamp: Date.now(),
-          status: 409,
-          error: 'Conflict',
-          message: '用户名已存在'
-        })
-      } else {
-        // 用户名不存在
-        res.sendStatus(200)
-      }
-    })
-    .catch(err => res.status(500).send(err))
-})
+router.post('/register/check/name', controller.checkName)
 
 // $route  POST api/auth/register/check/email
 // @desc   返回请求的 json 数据
 // @access public
-router.post('/register/check/email', (req, res) => {
-  // 查询数据库
-  User.getUserByEmail(req.body)
-    .then(result => {
-      if (result) {
-        // 邮箱已存在
-        res.status(409).json({
-          timestamp: Date.now(),
-          status: 409,
-          error: 'Conflict',
-          message: '邮箱已存在'
-        })
-      } else {
-        // 邮箱不存在
-        res.sendStatus(200)
-      }
-    })
-    .catch(err => res.status(500).send(err))
-})
+router.post('/register/check/email', controller.checkEmail)
 
 module.exports = router
