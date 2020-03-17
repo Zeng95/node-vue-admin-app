@@ -44,3 +44,12 @@
 .z-50 {
   z-index: 50;
 }
+
+/* Top / Right / Bottom / Left */
+.top-half {
+  top: 50%;
+}
+
+.left-half {
+  left: 50%;
+}

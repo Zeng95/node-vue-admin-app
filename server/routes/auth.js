@@ -1,76 +1,28 @@
-const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 const express = require('express')
 const router = express.Router()
 
 const User = require('../models/user')
 const controller = require('../controllers/auth')
 
-// $route  GET /api/auth/login
-// @desc   返回token jwt passport
-// @access public
-router.post('/login', (req, res) => {
-  const { name, email, password } = req.body
+/**
+ * 用户登录
+ */
+router.post('/auth/login', controller.login)
 
-  if (name) {
-    // 查询数据库
-    User.getUserByName(name)
-      .then(result => {
-        if (result === '用户不存在') {
-          res.status(404).json({ message: '用户不存在！' })
-        } else {
-          const user = result
-          // 密码匹配
-          bcrypt
-            .compare(password, user.password)
-            .then(result => {
-              if (result) {
-                res.json({ messgae: '登录成功！' })
-              } else {
-                res.status(400).json({ message: '密码错误！' })
-              }
-            })
-            .catch(err => res.status(500).send(err))
-        }
-      })
-      .catch(err => res.status(500).send(err))
-  } else if (email) {
-    // 查询数据库
-    User.getUserByEmail(email)
-      .then(result => {
-        if (result === '用户不存在') {
-          res.status(404).json({ message: '用户不存在！' })
-        } else {
-          const user = result
-          // 密码匹配
-          bcrypt
-            .compare(password, user.password)
-            .then(result => {
-              if (result) {
-                res.json({ messgae: '登录成功！' })
-              } else {
-                res.status(400).json({ message: '密码错误！' })
-              }
-            })
-            .catch(err => res.status(500).send(err))
-        }
-      })
-      .catch(err => res.status(500).send(err))
-  }
-})
+/**
+ * 用户注册
+ */
+router.post('/auth/register', controller.register)
 
-// $route  POST /api/auth/register
-// @desc   返回请求的 json 数据
-// @access public
-router.post('/register', controller.register)
+/**
+ * 检查用户名是否可用
+ */
+router.post('/auth/register/check_name', controller.checkName)
 
-// $route  POST api/auth/register/check/name
-// @desc   返回请求的 json 数据
-// @access public
-router.post('/register/check/name', controller.checkName)
-
-// $route  POST api/auth/register/check/email
-// @desc   返回请求的 json 数据
-// @access public
-router.post('/register/check/email', controller.checkEmail)
+/**
+ * 检查邮箱是否可用
+ */
+router.post('/auth/register/check_email', controller.checkEmail)
 
 module.exports = router

@@ -12,7 +12,8 @@ class Database {
         `mongodb+srv://${process.env.APP_DB_SERVER}/${process.env.APP_DB_NAME}`,
         {
           useNewUrlParser: true,
-          useUnifiedTopology: true
+          useUnifiedTopology: true,
+          useFindAndModify: false
         }
       )
 

@@ -1,86 +1,193 @@
 const bcrypt = require('bcrypt')
 const gravatar = require('gravatar')
+const jwt = require('jsonwebtoken')
 const User = require('../models/user')
 
-const addUser = data => {
-  return new Promise((resolve, reject) => {
-    bcrypt.genSalt(10, (err, salt) => {
-      if (err) reject(err)
+exports.login = async (req, res) => {
+  try {
+    const { name, email, password } = req.body
 
-      bcrypt.hash(data.password, salt, async (err, hash) => {
-        if (err) reject(err)
+    /**
+     * 根据请求主体中 name 字段在数据库查找
+     */
+    if (name) {
+      foundUser = await User.findOne({ name })
+    }
 
-        const newUser = new User({
-          name: data.name,
-          password: hash,
-          email: data.email,
-          avatar: gravatar.url(data.email, {
-            protocol: 'https',
-            s: '200',
-            d: 'retro'
-          })
-        })
+    /**
+     * 根据请求主体中 email 字段在数据库查找
+     */
+    if (email) {
+      foundUser = await User.findOne({ email })
+    }
 
-        try {
-          await newUser.save()
-          resolve(newUser)
-        } catch (err) {
-          reject(err)
-        }
+    /**
+     * 如果数据库中没找到对应的用户则返回 404
+     */
+    if (!foundUser) {
+      return res.status(404).json({
+        success: false,
+        message: '用户名不存在'
       })
-    })
-  })
-}
+    }
 
-exports.login = () => {}
+    /**
+     * 将数据库中找到的用户的密码和请求主体中 password 字段做比较
+     * 同步操作
+     */
+    let passwordIsValid = foundUser.comparePassword(password)
+
+    /**
+     * 如果密码不匹配则返回 403
+     */
+    if (!passwordIsValid) {
+      return res.status(401).send({
+        success: false,
+        message: '密码错误'
+      })
+    }
+
+    /**
+     * 创建 Token，7 天后过期
+     */
+    const accessToken = jwt.sign(
+      { userId: foundUser._id },
+      process.env.APP_JWT_SECRET,
+      { expiresIn: '7d' }
+    )
+
+    /**
+     * 更新数据库中找到的用户的 Token
+     */
+    await User.findByIdAndUpdate(foundUser._id, { accessToken })
+
+    /**
+     * 登录成功
+     */
+    res.status(200).json({
+      success: true,
+      message: '登录成功',
+      user: {
+        name: foundUser.name,
+        email: foundUser.email,
+        avatar: foundUser.avatar,
+        accessToken
+      }
+    })
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: err.message
+    })
+  }
+}
 
 exports.register = async (req, res) => {
   try {
-    const user = await addUser(req.body)
-    res.status(200).json(user)
+    /**
+     * 实例化 User 模型
+     * 生成默认头像
+     */
+    const newUser = new User({
+      ...req.body,
+      avatar: gravatar.url(req.body.email, {
+        protocol: 'https',
+        s: '200',
+        d: 'retro'
+      })
+    })
+
+    /**
+     * 创建 Token，7 天后过期
+     */
+    const accessToken = jwt.sign(
+      { userId: newUser._id },
+      process.env.APP_JWT_SECRET,
+      { expiresIn: '7d' } // one week
+    )
+
+    newUser.accessToken = accessToken
+
+    /**
+     * 在数据库中创建新的用户
+     */
+    await newUser.save()
+
+    /**
+     * 注册成功
+     */
+    res.status(200).json({
+      success: true,
+      message: '注册成功',
+      user: {
+        name: newUser.name,
+        email: newUser.email,
+        avatar: newUser.avatar,
+        accessToken
+      }
+    })
   } catch (err) {
-    res.status(500).send(err)
+    res.status(500).json({
+      success: false,
+      message: err.message
+    })
   }
 }
 
 exports.checkName = async (req, res) => {
   try {
-    const result = await User.findOne(req.body)
+    const { name } = req.body
+    const foundUser = await User.findOne({ name })
 
-    if (result) {
-      // 用户名已存在
-      res.status(409).json({
-        timestamp: Date.now(),
-        status: 409,
-        error: 'Conflict',
+    if (foundUser) {
+      /**
+       * 如果用户名已存在，说明不可用则返回 409
+       */
+      return res.status(409).json({
+        success: false,
         message: '用户名已存在'
       })
-    } else {
-      // 用户名不存在
-      res.sendStatus(200)
     }
+
+    /**
+     * 用户名可用
+     */
+    res.status(200).json({
+      success: true
+    })
   } catch (err) {
-    res.status(500).send(err)
+    res.status(500).json({
+      success: false,
+      message: err.message
+    })
   }
 }
 
 exports.checkEmail = async (req, res) => {
   try {
-    const result = await User.findOne(req.body)
+    const { email } = req.body
+    const foundUser = await User.findOne({ email })
 
-    if (result) {
-      // 邮箱已存在
+    if (foundUser) {
+      /**
+       * 如果邮箱已存在，说明不可用则返回 409
+       */
       res.status(409).json({
-        timestamp: Date.now(),
-        status: 409,
-        error: 'Conflict',
+        success: false,
         message: '邮箱已存在'
       })
-    } else {
-      // 邮箱不存在
-      res.sendStatus(200)
     }
+
+    /**
+     * 邮箱可用
+     */
+    res.status(200).json({
+      success: true
+    })
   } catch (err) {
-    res.status(500).send(err)
+    res.status(500).json({
+      success: false,
+      message: err.message
+    })
   }
 }

@@ -14,18 +14,13 @@ require('./database')
 const authRouter = require('./routes/auth')
 const userRouter = require('./routes/auth')
 
-const corsOptions = {
-  origin: 'http://localhost:8080'
-}
-
 // Middlewares
 app.use(morgan('dev'))
-app.use(cors(corsOptions))
+app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-
-app.use('/api/auth', authRouter)
-app.use('/api/user', userRouter)
+app.use('/api', authRouter)
+app.use('/api', userRouter)
 
 app.listen(port, err => {
   if (err) {

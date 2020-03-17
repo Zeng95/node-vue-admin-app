@@ -27,7 +27,9 @@
             </div>
 
             <b-form-input
+              lazy
               trim
+              lazy-formatter
               size="lg"
               type="text"
               v-model="$v.form.name.$model"
@@ -283,18 +285,24 @@ export default {
   methods: {
     ...mapActions('auth', ['register']),
     nameFormatter(value) {
+      const { $dirty, $error } = this.$v.form.name
       const newValue = value.toLowerCase()
 
-      // 校验用户名是否已被注册
-      this.isNameAvailable(newValue)
+      if ($dirty && !$error) {
+        // 校验用户名是否已被注册
+        this.isNameAvailable(newValue)
+      }
 
       return newValue
     },
     emailFormatter(value) {
+      const { $dirty, $error } = this.$v.form.email
       const newValue = value.toLowerCase()
 
-      // 校验用户名是否已被注册
-      this.isEmailAvailable(newValue)
+      if ($dirty && !$error) {
+        // 校验用户名是否已被注册
+        this.isEmailAvailable(newValue)
+      }
 
       return newValue
     },
@@ -342,7 +350,6 @@ export default {
     },
     async isNameAvailable(name) {
       try {
-        // 发送请求
         await auth.checkName({ name })
         this.form.nameAvailable = true
       } catch (error) {
