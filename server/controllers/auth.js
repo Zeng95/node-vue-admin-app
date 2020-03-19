@@ -1,7 +1,8 @@
-const bcrypt = require('bcrypt')
 const gravatar = require('gravatar')
 const jwt = require('jsonwebtoken')
 const User = require('../models/user')
+
+const { APP_JWT_SECRET } = process.env
 
 exports.login = async (req, res) => {
   try {
@@ -50,11 +51,9 @@ exports.login = async (req, res) => {
     /**
      * 创建 Token，7 天后过期
      */
-    const accessToken = jwt.sign(
-      { userId: foundUser._id },
-      process.env.APP_JWT_SECRET,
-      { expiresIn: '7d' }
-    )
+    const accessToken = jwt.sign({ userId: foundUser._id }, APP_JWT_SECRET, {
+      expiresIn: '7d'
+    })
 
     /**
      * 更新数据库中找到的用户的 Token
@@ -68,10 +67,11 @@ exports.login = async (req, res) => {
       success: true,
       message: '登录成功',
       user: {
+        id: foundUser._id,
         name: foundUser.name,
         email: foundUser.email,
         avatar: foundUser.avatar,
-        accessToken
+        accessToken: `Bearer ${accessToken}`
       }
     })
   } catch (err) {
@@ -102,7 +102,7 @@ exports.register = async (req, res) => {
      */
     const accessToken = jwt.sign(
       { userId: newUser._id },
-      process.env.APP_JWT_SECRET,
+      APP_JWT_SECRET,
       { expiresIn: '7d' } // one week
     )
 
@@ -120,10 +120,11 @@ exports.register = async (req, res) => {
       success: true,
       message: '注册成功',
       user: {
+        id: newUser._id,
         name: newUser.name,
         email: newUser.email,
         avatar: newUser.avatar,
-        accessToken
+        accessToken: `Bearer ${accessToken}`
       }
     })
   } catch (err) {
@@ -172,7 +173,7 @@ exports.checkEmail = async (req, res) => {
       /**
        * 如果邮箱已存在，说明不可用则返回 409
        */
-      res.status(409).json({
+      return res.status(409).json({
         success: false,
         message: '邮箱已存在'
       })

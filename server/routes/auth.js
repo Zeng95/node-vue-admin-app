@@ -6,12 +6,12 @@ const User = require('../models/user')
 const controller = require('../controllers/auth')
 
 /**
- * 用户登录
+ * 登录
  */
 router.post('/auth/login', controller.login)
 
 /**
- * 用户注册
+ * 注册
  */
 router.post('/auth/register', controller.register)
 

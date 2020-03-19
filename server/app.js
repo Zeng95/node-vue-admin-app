@@ -1,26 +1,28 @@
 // 搭建本地服务器
-const express = require('express')
-const dotenv = require('dotenv')
-const morgan = require('morgan')
 const cors = require('cors')
+const express = require('express')
+const morgan = require('morgan')
+const passport = require('passport')
 const { success, error } = require('consola')
 
+require('dotenv').config()
+require('./config/database')
+require('./config/passport')(passport)
+
 const app = express()
-const port = 5000
-
-dotenv.config()
-require('./database')
-
+const port = process.env.APP_PORT || 5000
 const authRouter = require('./routes/auth')
-const userRouter = require('./routes/auth')
+const usersRouter = require('./routes/users')
 
-// Middlewares
-app.use(morgan('dev'))
+// 中间件
 app.use(cors())
+app.use(morgan('dev'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+app.use(passport.initialize())
+
 app.use('/api', authRouter)
-app.use('/api', userRouter)
+app.use('/api', usersRouter)
 
 app.listen(port, err => {
   if (err) {
