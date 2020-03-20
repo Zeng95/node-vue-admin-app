@@ -1,0 +1,22 @@
+{
+  "name": "admin-app",
+  "version": "1.0.0",
+  "scripts": {
+    "client": "npm start --prefix client",
+    "server": "npm start --prefix server",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Zeng95/vue-bootstrap-admin-backend.git"
+  },
+  "author": "Leo Zeng",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Zeng95/vue-bootstrap-admin-backend/issues"
+  },
+  "homepage": "https://github.com/Zeng95/vue-bootstrap-admin-backend",
+  "dependencies": {
+    "concurrently": "^5.1.0"
+  }
+}

@@ -1,5 +1,5 @@
 {
-  "name": "node-vue-admin-frontend",
+  "name": "admin-app-client",
   "version": "0.1.0",
   "private": true,
   "scripts": {

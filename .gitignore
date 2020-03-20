@@ -99,6 +99,8 @@ typings/
 # dotenv environment variables file
 .env
 .env.test
+.env.local
+.env.*.local
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
@@ -147,6 +149,14 @@ temp/
 ### VisualStudioCode Patch ###
 # Ignore all local history of files
 .history
+
+# Editor directories and files
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
 # End of https://www.gitignore.io/api/visualstudiocode,macos,node
 

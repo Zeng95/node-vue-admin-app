@@ -1,20 +1,14 @@
 {
-  "name": "node-vue-admin-backend",
+  "name": "admin-app-server",
   "version": "0.1.0",
-  "description": "A RESTful web api service",
   "main": "app.js",
   "scripts": {
-    "client-install": "npm install --prefix client",
-    "client": "npm start --prefix client",
-    "start": "node app.js",
-    "server": "nodemon app.js",
-    "dev": "concurrently \"npm run server\" \"npm run client\""
+    "start": "nodemon app.js"
   },
   "author": "Leo Zeng",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^4.0.1",
-    "concurrently": "^5.1.0",
     "consola": "^2.11.3",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
