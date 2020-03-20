@@ -13,6 +13,7 @@
     "bootstrap": "^4.4.1",
     "bootstrap-vue": "^2.7.0",
     "core-js": "^3.6.4",
+    "nprogress": "^0.2.0",
     "vue": "^2.6.11",
     "vue-router": "^3.1.6",
     "vuelidate": "^0.7.5",
