@@ -6,7 +6,6 @@
       <!-- Title -->
       <h1 class="title text-black font-weight-normal">后台管理系统</h1>
 
-      <!-- Form -->
       <div class="form-container bg-white p-5 rounded-lg position-relative">
         <!-- Subtitle -->
         <h2 class="subtitle text-black text-center font-weight-normal mb-5">
@@ -146,7 +145,7 @@
             </b-form-invalid-feedback>
           </b-form-group>
 
-          <!-- Identity -->
+          <!-- Role -->
           <b-form-group class="position-relative mb-4">
             <!-- Prepend Icon -->
             <div class="icon-prepend d-flex position-absolute z-50">
@@ -155,25 +154,27 @@
 
             <!-- Select -->
             <b-form-select
-              v-model.trim="$v.form.identity.$model"
-              :state="validateState('identity')"
+              v-model.trim="$v.form.role.$model"
+              :state="validateState('role')"
               class="text-sm text-dark-gray"
-              :class="{ active: form.identity ? 'active' : '' }"
+              :class="{ active: form.role ? 'active' : '' }"
               size="lg"
             >
               <b-form-select-option value hidden>
                 身份
               </b-form-select-option>
-              <b-form-select-option value="manager">
+              <b-form-select-option value="admin">
                 管理员
               </b-form-select-option>
-              <b-form-select-option value="employee">员工</b-form-select-option>
+              <b-form-select-option value="user">
+                用户
+              </b-form-select-option>
             </b-form-select>
 
             <!-- Feedback -->
             <b-form-valid-feedback></b-form-valid-feedback>
             <b-form-invalid-feedback>
-              <span v-if="!$v.form.identity.required">身份不能为空</span>
+              <span v-if="!$v.form.role.required">身份不能为空</span>
             </b-form-invalid-feedback>
           </b-form-group>
 
@@ -249,7 +250,7 @@ export default {
         pwd: '',
         pwdType: 'password',
         repeatPwd: '',
-        identity: '',
+        role: '',
         showPwd: false
       },
       showToast: false,
@@ -277,7 +278,7 @@ export default {
         required,
         sameAsPassword: sameAs('pwd')
       },
-      identity: {
+      role: {
         required
       }
     }
@@ -338,7 +339,8 @@ export default {
       const data = {
         name: this.form.name,
         email: this.form.email,
-        password: this.form.pwd
+        password: this.form.pwd,
+        role: this.form.role
       }
 
       try {

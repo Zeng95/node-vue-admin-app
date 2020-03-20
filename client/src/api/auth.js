@@ -3,11 +3,11 @@ import httpClient from './httpClient'
 const END_POINT = '/auth'
 
 const checkName = data => {
-  return httpClient.post(`${END_POINT}/register/check/name`, data)
+  return httpClient.post(`${END_POINT}/register/check_name`, data)
 }
 
 const checkEmail = data => {
-  return httpClient.post(`${END_POINT}/register/check/email`, data)
+  return httpClient.post(`${END_POINT}/register/check_email`, data)
 }
 
 const register = data => {
@@ -18,14 +18,9 @@ const login = data => {
   return httpClient.post(`${END_POINT}/login`, data)
 }
 
-const logout = () => {
-  return httpClient.post(`${END_POINT}/logout`)
-}
-
 export default {
   register,
   checkName,
   checkEmail,
-  login,
-  logout
+  login
 }
