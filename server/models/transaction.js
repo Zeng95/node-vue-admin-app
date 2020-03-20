@@ -22,10 +22,6 @@ const transactionSchema = new Schema(
     },
     remark: {
       type: String
-    },
-    date: {
-      type: Date,
-      default: Date.now
     }
   },
   { timestamps: true }

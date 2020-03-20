@@ -4,22 +4,30 @@ const router = express.Router()
 const controller = require('../controllers/auth')
 
 /**
- * 登录
+ * 用户登录
+ *
+ * @access Public
  */
 router.post('/auth/login', controller.login)
 
 /**
- * 注册
+ * 用户注册
+ *
+ * @access Public
  */
 router.post('/auth/register', controller.register)
 
 /**
  * 检查用户名是否可用
+ *
+ * @access Public
  */
 router.post('/auth/register/check_name', controller.checkName)
 
 /**
  * 检查邮箱是否可用
+ *
+ * @access Public
  */
 router.post('/auth/register/check_email', controller.checkEmail)
 
