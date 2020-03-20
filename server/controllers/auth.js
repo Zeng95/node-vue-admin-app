@@ -1,6 +1,7 @@
 const gravatar = require('gravatar')
 const jwt = require('jsonwebtoken')
 const User = require('../models/user')
+const Role = require('../models/role')
 
 const { APP_JWT_SECRET } = process.env
 
@@ -84,12 +85,15 @@ exports.login = async (req, res) => {
 
 exports.register = async (req, res) => {
   try {
+    const foundRole = await Role.findOne({ name: req.body.role })
+
     /**
      * 实例化 User 模型
      * 生成默认头像
      */
     const newUser = new User({
       ...req.body,
+      role: foundRole._id,
       avatar: gravatar.url(req.body.email, {
         protocol: 'https',
         s: '200',

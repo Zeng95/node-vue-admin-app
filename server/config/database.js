@@ -1,5 +1,6 @@
 const { connect } = require('mongoose')
 const { success, error } = require('consola')
+const { APP_DB_HOST, APP_DB_NAME } = process.env
 
 class Database {
   constructor() {
@@ -8,14 +9,11 @@ class Database {
 
   async _connect() {
     try {
-      await connect(
-        `mongodb+srv://${process.env.APP_DB_SERVER}/${process.env.APP_DB_NAME}`,
-        {
-          useNewUrlParser: true,
-          useUnifiedTopology: true,
-          useFindAndModify: false
-        }
-      )
+      await connect(`mongodb+srv://${APP_DB_HOST}/${APP_DB_NAME}`, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        useFindAndModify: false
+      })
 
       success({
         message: 'Database connection successful',
@@ -23,7 +21,7 @@ class Database {
       })
     } catch (err) {
       error({
-        message: 'Database connection error',
+        message: `Database connection ${err}`,
         badge: true
       })
     }

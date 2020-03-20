@@ -13,6 +13,7 @@ const app = express()
 const port = process.env.APP_PORT || 5000
 const authRouter = require('./routes/auth')
 const usersRouter = require('./routes/users')
+const transactionsRouter = require('./routes/transactions')
 
 // 中间件
 app.use(cors())
@@ -23,6 +24,7 @@ app.use(passport.initialize())
 
 app.use('/api', authRouter)
 app.use('/api', usersRouter)
+app.use('/api', transactionsRouter)
 
 app.listen(port, err => {
   if (err) {

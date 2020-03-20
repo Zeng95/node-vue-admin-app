@@ -4,6 +4,10 @@ const SchemaObjectId = Schema.Types.ObjectId
 
 const userSchema = new Schema(
   {
+    role: {
+      type: SchemaObjectId,
+      ref: 'Role'
+    },
     name: {
       type: String,
       required: true,
@@ -23,10 +27,6 @@ const userSchema = new Schema(
     },
     accessToken: {
       type: String
-    },
-    role: {
-      type: SchemaObjectId,
-      ref: 'Role'
     }
   },
   { timestamps: true }
