@@ -1,7 +1,8 @@
 import axios from 'axios'
 
+const { VUE_APP_BASE_URL } = process.env
 const httpClient = axios.create({
-  baseURL: process.env.VUE_APP_BASE_URL,
+  baseURL: VUE_APP_BASE_URL,
   headers: {
     'Content-Type': 'application/json'
     // anything you want to add to the headers
