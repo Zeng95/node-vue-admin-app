@@ -5,7 +5,6 @@ const getUser = () => {
 }
 
 /**
- *
  * @param {Object} user
  */
 const setUser = user => {

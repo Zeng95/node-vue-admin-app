@@ -7,7 +7,7 @@
       <h1 class="title text-black font-weight-normal">后台管理系统</h1>
 
       <!-- Form Container -->
-      <div class="form-container bg-white p-5 rounded-lg">
+      <div class="form-container bg-white p-5 rounded-lg position-relative">
         <!-- Subtitle -->
         <h2 class="subtitle text-black text-center font-weight-normal mb-5">
           登录
@@ -78,10 +78,22 @@
             variant="dark"
             class="submit d-block w-100 mx-auto text-sm"
             size="lg"
+            :disabled="isDisabled"
           >
+            <b-spinner small v-if="showSpinner"></b-spinner>
             登录
           </b-button>
         </b-form>
+
+        <!-- Direct Register -->
+        <div class="register_pc_direct_register position-absolute text-sm">
+          <router-link
+            :to="{ name: 'Register' }"
+            class="text-dark text-decoration-none"
+          >
+            还没有账号？现在注册>
+          </router-link>
+        </div>
       </div>
     </div>
 
@@ -135,7 +147,9 @@ export default {
         pwd: '',
         pwdType: 'password',
         showPwd: false
-      }
+      },
+      isDisabled: false,
+      showSpinner: false
     }
   },
   validations: {
@@ -163,10 +177,35 @@ export default {
         this.form.pwdType = 'password'
       }
     },
-    handleLogin() {
+    emailIsValid(email) {
+      const emailFormat = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      return emailFormat.test(email)
+    },
+    async handleLogin() {
+      // 表单校验
       this.$v.form.$touch()
 
       if (this.$v.form.$anyError) return false
+
+      const emailIsValid = this.emailIsValid(this.form.username)
+      const fomrData = {
+        password: this.form.pwd
+      }
+
+      // 登录按钮禁用
+      this.isDisabled = true
+      // 显示 spinner
+      this.showSpinner = true
+
+      if (emailIsValid) {
+        fomrData.email = this.form.username
+      } else {
+        fomrData.name = this.form.username
+      }
+
+      await this.login(fomrData)
+
+      this.$router.push({ name: 'Home' })
     }
   }
 }
@@ -178,16 +217,16 @@ export default {
   background-size: cover;
   .title {
     margin-bottom: 20px;
+    color: rgb(34, 34, 34);
     letter-spacing: 0.2em;
     font-size: 32px;
-    color: rgb(34, 34, 34);
   }
   .form-container {
     width: 45%;
     .subtitle {
+      color: rgb(34, 34, 34);
       letter-spacing: 0.2em;
       font-size: 24px;
-      color: rgb(34, 34, 34);
     }
     .form {
       .icon-username,
@@ -209,9 +248,10 @@ export default {
         font-size: 14px;
       }
     }
-  }
-  .toast {
-    color: red;
+    .register_pc_direct_register {
+      right: 48px;
+      bottom: 14px;
+    }
   }
 }
 </style>

@@ -1,3 +1,5 @@
+/* Margin */
+
 /* Font Size */
 .text-sm {
   font-size: 0.875rem;
@@ -8,7 +10,11 @@
 }
 
 .text-lg {
-  font-size: 2rem;
+  font-size: 1.125rem;
+}
+
+.text-xl {
+  font-size: 1.25rem;
 }
 
 /* Text Color */

@@ -1,13 +1,13 @@
 <template>
   <div class="wrapper w-100 h-100">
-    <!-- Navbar -->
+    <!-- Page Navbar -->
     <AppNavbar />
-
-    <!-- Sidebar -->
-    <AppSidebar />
 
     <!-- Page Content -->
     <AppMain />
+
+    <!-- Page Sidebar -->
+    <AppSidebar />
   </div>
 </template>
 

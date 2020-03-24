@@ -377,16 +377,16 @@ export default {
   background-size: cover;
   .title {
     margin-bottom: 20px;
+    color: rgb(34, 34, 34);
     letter-spacing: 0.2em;
     font-size: 32px;
-    color: rgb(34, 34, 34);
   }
   .form-container {
     width: 45%;
     .subtitle {
+      color: rgb(34, 34, 34);
       letter-spacing: 0.2em;
       font-size: 24px;
-      color: rgb(34, 34, 34);
     }
     .form {
       .icon-prepend {
@@ -414,8 +414,8 @@ export default {
       }
     }
     .register_pc_direct_login {
-      bottom: 14px;
       right: 48px;
+      bottom: 14px;
     }
   }
   .alert-message {
