@@ -2,11 +2,11 @@
 
 /* Font Size */
 .text-sm {
-  font-size: 0.875rem;
+  font-size: 0.875rem !important;
 }
 
 .text-base {
-  font-size: 1rem;
+  font-size: 1rem !important;
 }
 
 .text-lg {
@@ -46,6 +46,15 @@
   transform: translateX(-50%);
 }
 
+/* Scale */
+.scale-55 {
+  transform: scale(0.55);
+}
+
+.scale-65 {
+  transform: scale(0.65);
+}
+
 /* Z-Index */
 .z-50 {
   z-index: 50;
@@ -58,4 +67,8 @@
 
 .left-half {
   left: 50%;
+}
+
+.outline-none {
+  outline: none !important;
 }

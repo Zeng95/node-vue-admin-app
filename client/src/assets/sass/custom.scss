@@ -1,0 +1,19 @@
+// variable overrides
+$link-color: white !default;
+
+// Bootstrap and its default variables
+@import '~bootstrap/scss/bootstrap.scss';
+// BootstrapVue and its default variables
+@import '~bootstrap-vue/src/index.scss';
+
+body {
+  font-size: 0.875rem;
+}
+
+a {
+  outline: none;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}

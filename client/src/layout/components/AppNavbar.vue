@@ -1,7 +1,7 @@
 <template>
   <header id="header" class="position-fixed bg-white">
     <!-- Navbar -->
-    <b-navbar type="light" class="h-100">
+    <b-navbar type="light">
       <b-navbar-brand href="#">NavBar</b-navbar-brand>
 
       <b-collapse id="nav-collapse" is-nav>
@@ -53,7 +53,7 @@
           </b-nav-item-dropdown>
 
           <!-- 头像 -->
-          <b-nav-item-dropdown right lazy class="mx-2">
+          <b-nav-item-dropdown right :no-caret="true" class="mx-2">
             <!-- Using 'button-content' slot -->
             <template v-slot:button-content>
               <b-img
@@ -136,8 +136,8 @@ export default {
     }
 
     .icon {
-      width: 24px;
-      height: 24px;
+      width: 18px;
+      height: 18px;
     }
 
     .badge {
@@ -146,9 +146,9 @@ export default {
     }
 
     .avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 6px;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
       cursor: pointer;
     }
   }

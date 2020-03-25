@@ -9,3 +9,8 @@ export default {
   name: 'App'
 }
 </script>
+
+<style lang="scss">
+@import './assets/sass/custom.scss';
+@import './assets/css/utility.css';
+</style>

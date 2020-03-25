@@ -3,13 +3,11 @@ import Vuelidate from 'vuelidate'
 import App from './App.vue'
 import router from './router'
 import store from './store'
-import './plugins/echarts-vue'
 import '@babel/polyfill'
 import 'mutationobserver-shim'
 import './plugins/bootstrap-vue'
-import './assets/css/custom.css'
-import './assets/css/utility.css'
-import './assets/css/main.css'
+import './plugins/echarts-vue'
+import './assets/sass/custom.scss'
 
 Vue.use(Vuelidate)
 Vue.config.productionTip = false
