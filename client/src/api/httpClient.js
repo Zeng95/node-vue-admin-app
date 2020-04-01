@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { getToken } from '@/utils/auth'
 
 const { VUE_APP_BASE_URL } = process.env
 const httpClient = axios.create({
@@ -9,17 +10,16 @@ const httpClient = axios.create({
   }
 })
 
+const authInterceptor = config => {
+  config.headers['Authorization'] = getToken()
+  return config
+}
+
 // Add a request interceptor
-httpClient.interceptors.request.use(
-  config => {
-    // Do something before request is sent
-    return config
-  },
-  error => {
-    // Do something with request error
-    return Promise.reject(error)
-  }
-)
+httpClient.interceptors.request.use(authInterceptor, error => {
+  // Do something with request error
+  return Promise.reject(error)
+})
 
 // Add a response interceptor
 httpClient.interceptors.response.use(

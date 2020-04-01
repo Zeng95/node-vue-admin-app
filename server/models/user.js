@@ -24,9 +24,6 @@ const userSchema = new Schema(
     },
     avatar: {
       type: String
-    },
-    accessToken: {
-      type: String
     }
   },
   { timestamps: true }

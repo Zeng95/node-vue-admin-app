@@ -1,12 +1,12 @@
 const passport = require('passport')
 
-exports.currentUser = (req, res, next) => {
+exports.getUser = (req, res, next) => {
   passport.authenticate(
     'jwt',
     {
       session: false
     },
-    (err, user, info) => {
+    (err, data, info) => {
       if (err) {
         return res.status(500).json({
           success: false,
@@ -14,12 +14,14 @@ exports.currentUser = (req, res, next) => {
         })
       }
 
-      if (info !== undefined) {
+      if (info) {
         return res.status(404).json({
           success: false,
           message: info.message
         })
       }
+
+      const { foundUser: user, role } = data
 
       res.status(200).json({
         success: true,
@@ -27,7 +29,8 @@ exports.currentUser = (req, res, next) => {
           id: user._id,
           name: user.name,
           email: user.email,
-          role: user.role
+          avatar: user.avatar,
+          role: role.name
         }
       })
     }

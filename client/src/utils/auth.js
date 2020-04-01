@@ -1,18 +1,16 @@
-const UserKey = 'user-info'
+const TOKEN_KEY = 'access_token'
 
-const getUser = () => {
-  return JSON.parse(localStorage.getItem(UserKey))
+// Token
+const getToken = () => {
+  return localStorage.getItem(TOKEN_KEY)
 }
 
-/**
- * @param {Object} user
- */
-const setUser = user => {
-  return localStorage.setItem(UserKey, JSON.stringify(user))
+const setToken = token => {
+  return localStorage.setItem(TOKEN_KEY, token)
 }
 
-const removeUser = () => {
-  return localStorage.removeItem(UserKey)
+const removeToken = () => {
+  return localStorage.removeItem(TOKEN_KEY)
 }
 
-export { getUser, setUser, removeUser }
+export { getToken, setToken, removeToken }

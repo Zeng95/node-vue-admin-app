@@ -7,14 +7,14 @@ const controller = require('../controllers/transactions')
  *
  * @access Private
  */
-router.get('/transactions', controller.getTransactions)
+router.get('/transactions', controller.getAllTransactions)
 
 /**
  * 获取指定交易纪录
  *
  * @access Private
  */
-router.get('/transactions/:id', controller.getTransactionById)
+router.get('/transactions/:id', controller.getTransaction)
 
 /**
  * 新增交易纪录

@@ -1,7 +1,7 @@
 const passport = require('passport')
 const Transaction = require('../models/transaction')
 
-exports.getTransactions = (req, res) => {
+exports.getAllTransactions = (req, res) => {
   passport.authenticate(
     'jwt',
     {
@@ -50,7 +50,7 @@ exports.getTransactions = (req, res) => {
   )(req, res)
 }
 
-exports.getTransactionById = (req, res) => {
+exports.getTransaction = (req, res) => {
   passport.authenticate(
     'jwt',
     {

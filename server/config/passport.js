@@ -1,7 +1,8 @@
-//passport.js
 const { Strategy: JWTStrategy, ExtractJwt } = require('passport-jwt')
 
+// 模型
 const User = require('../models/user')
+const Role = require('../models/role')
 
 const options = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -19,7 +20,12 @@ module.exports = passport => {
           return done(null, false)
         }
 
-        done(null, foundUser)
+        const role = await Role.findById(foundUser.role)
+
+        done(null, {
+          foundUser,
+          role
+        })
       } catch (err) {
         done(err, false)
       }

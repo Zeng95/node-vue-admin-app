@@ -1,7 +1,7 @@
 <template>
-  <div class="register w-100 h-100">
+  <div class="register w-100 vh-100">
     <div
-      class="container h-100 d-flex flex-column justify-content-center align-items-center"
+      class="container d-flex flex-column justify-content-center align-items-center h-100"
     >
       <!-- Title -->
       <h1 class="title text-black font-weight-normal">后台管理系统</h1>

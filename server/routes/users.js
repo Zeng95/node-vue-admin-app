@@ -7,6 +7,6 @@ const controller = require('../controllers/users')
  *
  * @access Private
  */
-router.get('/users/:id', controller.currentUser)
+router.get('/users/:id', controller.getUser)
 
 module.exports = router

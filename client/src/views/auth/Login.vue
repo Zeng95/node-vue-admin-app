@@ -1,7 +1,7 @@
 <template>
-  <div class="login w-100 h-100">
+  <div class="login w-100 vh-100">
     <div
-      class="container h-100 d-flex flex-column justify-content-center align-items-center"
+      class="container d-flex flex-column justify-content-center align-items-center h-100"
     >
       <!-- Title -->
       <h1 class="title text-black font-weight-normal">后台管理系统</h1>
@@ -112,6 +112,7 @@
           <strong class="mr-auto text-black">提示</strong>
         </div>
       </template>
+
       <p class="mb-0 text-dark-gray">
         目前有两个登陆角色：管理员和普通用户。
         <br />

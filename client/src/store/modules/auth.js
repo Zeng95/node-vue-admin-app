@@ -1,17 +1,15 @@
 import auth from '@/api/auth'
-import { getUser, setUser, removeUser } from '@/utils/auth'
+import { getToken, setToken, removeToken } from '@/utils/auth'
+import { setUserId } from '@/utils/user'
 
-const SUCCESS_OK = 200
-const user = getUser()
-const initialState = user
+const token = getToken()
+const initialState = token
   ? {
       status: { loggedIn: true },
-      user,
-      token: user.accessToken
+      token
     }
   : {
       status: { loggedIn: false },
-      user: null,
       token: null
     }
 
@@ -22,9 +20,6 @@ const state = initialState
 const getters = {
   loggedIn: state => {
     return state.status.loggedIn
-  },
-  user: state => {
-    return state.user
   }
 }
 
@@ -38,10 +33,6 @@ const mutations = {
     state.status.loggedIn = false
   },
 
-  SET_USER: (state, user) => {
-    state.user = user
-  },
-
   SET_TOKEN: (state, token) => {
     state.token = token
   }
@@ -49,45 +40,59 @@ const mutations = {
 
 // actions
 const actions = {
-  async register({ commit }, data) {
-    const res = await auth.register(data)
+  register({ commit }, formData) {
+    return new Promise((resolve, reject) => {
+      auth
+        .login(formData)
+        .then(res => {
+          const { token } = res.data
 
-    commit('SET_STATUS', true)
-    commit('SET_USER', res.data)
+          setToken(token)
+
+          commit('AUTH_SUCCESS')
+          commit('SET_TOKEN', token)
+
+          resolve()
+        })
+        .catch(err => {
+          commit('AUTH_FAILURE')
+
+          reject(err)
+        })
+    })
   },
 
-  async login({ commit }, formData) {
-    try {
-      const res = await auth.login(formData)
-      const { data, status } = res
+  login({ commit }, formData) {
+    return new Promise((resolve, reject) => {
+      auth
+        .login(formData)
+        .then(res => {
+          const { token, user } = res.data
 
-      // 状态码是否等于 200
-      if (status === SUCCESS_OK) {
-        commit('AUTH_SUCCESS')
-        commit('SET_TOKEN', data.accessToken)
-        commit('SET_USER', data.user)
+          setUserId(user.id)
+          setToken(token)
 
-        // 存储用户信息
-        setUser({
-          ...data.user,
-          accessToken: data.accessToken
+          commit('user/SET_ID', user.id, { root: true })
+          commit('SET_TOKEN', token)
+          commit('AUTH_SUCCESS')
+
+          resolve()
         })
+        .catch(err => {
+          commit('AUTH_FAILURE')
 
-        return 'success'
-      }
-    } catch (err) {
-      console.log(err)
-    }
+          reject(err)
+        })
+    })
   },
 
   logout({ commit }) {
     return new Promise(resolve => {
       commit('AUTH_FAILURE', false)
       commit('SET_TOKEN', null)
-      commit('SET_USER', null)
 
       // 清空用户信息
-      removeUser()
+      removeToken()
 
       resolve()
     })
