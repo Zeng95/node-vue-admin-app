@@ -12,7 +12,7 @@ const state = {
 
 // getters
 const getters = {
-  role: state => {
+  role: (state) => {
     return state.role
   }
 }
@@ -42,7 +42,7 @@ const actions = {
     return new Promise((resolve, reject) => {
       users
         .getUser(state.id)
-        .then(res => {
+        .then((res) => {
           const { user } = res.data
 
           commit('SET_NAME', user.name)
@@ -50,9 +50,9 @@ const actions = {
           commit('SET_AVATAR', user.avatar)
           commit('SET_ROLE', user.role)
 
-          resolve()
+          resolve(user.role)
         })
-        .catch(err => {
+        .catch((err) => {
           reject(err)
         })
     })

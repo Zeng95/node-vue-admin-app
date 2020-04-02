@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="w-100 h-100">
+  <div id="app">
     <router-view></router-view>
   </div>
 </template>
@@ -11,6 +11,5 @@ export default {
 </script>
 
 <style lang="scss">
-@import './assets/sass/custom.scss';
 @import './assets/css/utility.css';
 </style>

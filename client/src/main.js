@@ -6,7 +6,6 @@ import store from './store'
 import '@babel/polyfill'
 import 'mutationobserver-shim'
 import './plugins/bootstrap-vue'
-import './plugins/echarts-vue'
 import './assets/sass/custom.scss'
 
 Vue.use(Vuelidate)
@@ -15,5 +14,5 @@ Vue.config.productionTip = false
 new Vue({
   router,
   store,
-  render: h => h(App)
+  render: (h) => h(App)
 }).$mount('#app')

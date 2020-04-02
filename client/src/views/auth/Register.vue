@@ -137,7 +137,7 @@
               <span
                 v-if="
                   !$v.form.repeatPwd.required ||
-                    !$v.form.repeatPwd.sameAsPassword
+                  !$v.form.repeatPwd.sameAsPassword
                 "
               >
                 新密码和确认密码输入不一致

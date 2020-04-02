@@ -1,5 +1,5 @@
 <template>
-  <main class="content float-right h-100">
+  <main class="router-content">
     <transition name="fade">
       <router-view />
     </transition>
@@ -7,11 +7,8 @@
 </template>
 
 <style lang="scss" scoped>
-.content {
+.router-content {
   padding: 30px 15px;
-  padding-top: 150px;
-  width: calc(100% - 260px);
-  background-color: #eee;
 }
 
 .fade-enter-active,

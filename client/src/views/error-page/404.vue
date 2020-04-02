@@ -1,7 +1,7 @@
 <template>
   <div class="not-found">
     <img
-      src="../assets/images/404.gif"
+      src="../../assets/images/404.gif"
       alt="Not Found"
       width="100%"
       height="100%"

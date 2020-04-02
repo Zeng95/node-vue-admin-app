@@ -2,19 +2,19 @@ import httpClient from './httpClient'
 
 const END_POINT = '/auth'
 
-const checkName = name => {
+const checkName = (name) => {
   return httpClient.post(`${END_POINT}/register/check_name`, name)
 }
 
-const checkEmail = email => {
+const checkEmail = (email) => {
   return httpClient.post(`${END_POINT}/register/check_email`, email)
 }
 
-const register = data => {
+const register = (data) => {
   return httpClient.post(`${END_POINT}/register`, data)
 }
 
-const login = data => {
+const login = (data) => {
   return httpClient.post(`${END_POINT}/login`, data)
 }
 

@@ -1,14 +1,16 @@
 <template>
-  <header id="header" class="position-fixed bg-white">
-    <!-- Navbar -->
-    <b-navbar type="light">
-      <b-navbar-brand href="#">NavBar</b-navbar-brand>
+  <div class="header-wrapper">
+    <header class="header bg-white rounded-xl shadow">
+      <!-- Navbar -->
+      <b-navbar type="light">
+        <b-navbar-brand class="pl-3">
+          <b-icon-list @click="handleMinimizeSidebar"></b-icon-list>
+        </b-navbar-brand>
 
-      <b-collapse id="nav-collapse" is-nav>
         <b-navbar-nav>
-          <b-nav-item class="px-3" href="#">首页</b-nav-item>
-          <b-nav-item class="px-3" href="#">用户</b-nav-item>
-          <b-nav-item class="px-3" href="#">设置</b-nav-item>
+          <b-nav-item class="px-3" link-classes="text-body">首页</b-nav-item>
+          <b-nav-item class="px-3" link-classes="text-body">用户</b-nav-item>
+          <b-nav-item class="px-3" link-classes="text-body">设置</b-nav-item>
         </b-navbar-nav>
 
         <!-- 右侧的导航项 -->
@@ -18,7 +20,7 @@
             <template v-slot:button-content>
               <b-icon-bell class="icon d-block"></b-icon-bell>
               <b-badge class="position-absolute" variant="danger" pill>
-                4
+                5
               </b-badge>
             </template>
 
@@ -54,15 +56,15 @@
 
           <!-- 头像 -->
           <b-nav-item-dropdown right :no-caret="true" class="mx-2">
-            <!-- Using 'button-content' slot -->
             <template v-slot:button-content>
-              <b-img
-                v-if="user"
-                class="avatar"
-                :src="user.avatar"
-                fluid
-                alt="头像"
-              ></b-img>
+              abc
+              <!-- <b-img
+                  v-if="user"
+                  class="avatar"
+                  :src="user.avatar"
+                  fluid
+                  alt="头像"
+                ></b-img> -->
             </template>
 
             <b-dropdown-item :to="{ name: 'Dashboard' }">
@@ -80,35 +82,53 @@
             </b-dropdown-item>
           </b-nav-item-dropdown>
         </b-navbar-nav>
-      </b-collapse>
-    </b-navbar>
+      </b-navbar>
 
-    <!-- Subheader -->
-    <div class="subheader w-100 px-3 border-top">
-      <b-breadcrumb class="bg-transparent mb-0">
-        <b-breadcrumb-item href="#home">Home</b-breadcrumb-item>
-        <b-breadcrumb-item href="#">Dashboard</b-breadcrumb-item>
-      </b-breadcrumb>
-    </div>
-  </header>
+      <!-- Subheader -->
+      <div class="subheader w-100 px-3 border-top">
+        <b-breadcrumb class="mb-0 bg-transparent align-items-center">
+          <b-breadcrumb-item :to="{ name: 'Home' }">
+            <b-icon-house-door
+              class="icon-house"
+              variant="info"
+            ></b-icon-house-door>
+          </b-breadcrumb-item>
+
+          <b-breadcrumb-item active class="text-info">
+            Dashboard
+          </b-breadcrumb-item>
+        </b-breadcrumb>
+      </div>
+    </header>
+  </div>
 </template>
 
 <script>
-import { BIconListTask, BIconEnvelope, BIconBell } from 'bootstrap-vue'
+import {
+  BIconList,
+  BIconBell,
+  BIconListTask,
+  BIconEnvelope,
+  BIconHouseDoor
+} from 'bootstrap-vue'
 import { mapGetters, mapActions } from 'vuex'
 
 export default {
   components: {
-    // BIconThreeDotsVertical
+    BIconList,
     BIconBell,
     BIconListTask,
-    BIconEnvelope
+    BIconEnvelope,
+    BIconHouseDoor
   },
   computed: {
     ...mapGetters('auth', ['user'])
   },
   methods: {
     ...mapActions('auth', ['logout']),
+    handleMinimizeSidebar() {
+      alert(1)
+    },
     async handleLogout() {
       await this.logout()
 
@@ -119,15 +139,14 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-#header {
-  top: 0;
-  right: 0;
-  left: 260px;
-  z-index: 100;
-  box-shadow: 0 2px 2px 0 rgba(60, 75, 100, 0.14),
-    0 3px 1px -2px rgba(60, 75, 100, 0.12), 0 1px 5px 0 rgba(60, 75, 100, 0.2);
+.header-wrapper {
+  padding: 1.3rem 30px 0;
 
   .navbar {
+    .navbar-brand {
+      margin-left: -2px;
+    }
+
     .hamburger-container {
       margin-right: 12px;
       width: 40px;
@@ -155,6 +174,11 @@ export default {
 
   .subheader {
     height: 48px;
+
+    .icon-house {
+      width: 18px;
+      height: 18px;
+    }
   }
 }
 </style>

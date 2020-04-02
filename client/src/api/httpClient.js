@@ -10,23 +10,23 @@ const httpClient = axios.create({
   }
 })
 
-const authInterceptor = config => {
+const authInterceptor = (config) => {
   config.headers['Authorization'] = getToken()
   return config
 }
 
 // Add a request interceptor
-httpClient.interceptors.request.use(authInterceptor, error => {
+httpClient.interceptors.request.use(authInterceptor, (error) => {
   // Do something with request error
   return Promise.reject(error)
 })
 
 // Add a response interceptor
 httpClient.interceptors.response.use(
-  response => {
+  (response) => {
     return response
   },
-  error => {
+  (error) => {
     return Promise.reject(error)
   }
 )

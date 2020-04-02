@@ -5,7 +5,7 @@ const getUserId = () => {
   return localStorage.getItem(USER_ID_KEY)
 }
 
-const setUserId = id => {
+const setUserId = (id) => {
   return localStorage.setItem(USER_ID_KEY, id)
 }
 

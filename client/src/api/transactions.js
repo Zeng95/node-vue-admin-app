@@ -6,11 +6,11 @@ const getAllTransactions = () => {
   return httpClient.get(END_POINT)
 }
 
-const getTransaction = id => {
+const getTransaction = (id) => {
   return httpClient.get(`${END_POINT}/${id}`)
 }
 
-const createTransaction = transaction => {
+const createTransaction = (transaction) => {
   return httpClient.get(END_POINT, transaction)
 }
 
@@ -21,7 +21,7 @@ const updateTransaction = (id, transaction) => {
   return httpClient.get(`${END_POINT}/${id}`, transaction)
 }
 
-const deleteTransaction = id => {
+const deleteTransaction = (id) => {
   return httpClient.get(`${END_POINT}/${id}`)
 }
 

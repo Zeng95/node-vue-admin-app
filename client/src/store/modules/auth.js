@@ -2,11 +2,11 @@ import auth from '@/api/auth'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { setUserId } from '@/utils/user'
 
-const token = getToken()
-const initialState = token
+const hasToken = getToken()
+const initialState = hasToken
   ? {
       status: { loggedIn: true },
-      token
+      token: hasToken
     }
   : {
       status: { loggedIn: false },
@@ -18,23 +18,23 @@ const state = initialState
 
 // getters
 const getters = {
-  loggedIn: state => {
+  loggedIn: (state) => {
     return state.status.loggedIn
   }
 }
 
 // mutations
 const mutations = {
-  AUTH_SUCCESS: state => {
+  SET_TOKEN: (state, token) => {
+    state.token = token
+  },
+
+  AUTH_SUCCESS: (state) => {
     state.status.loggedIn = true
   },
 
-  AUTH_FAILURE: state => {
+  AUTH_FAILURE: (state) => {
     state.status.loggedIn = false
-  },
-
-  SET_TOKEN: (state, token) => {
-    state.token = token
   }
 }
 
@@ -44,7 +44,7 @@ const actions = {
     return new Promise((resolve, reject) => {
       auth
         .login(formData)
-        .then(res => {
+        .then((res) => {
           const { token } = res.data
 
           setToken(token)
@@ -54,7 +54,7 @@ const actions = {
 
           resolve()
         })
-        .catch(err => {
+        .catch((err) => {
           commit('AUTH_FAILURE')
 
           reject(err)
@@ -66,7 +66,7 @@ const actions = {
     return new Promise((resolve, reject) => {
       auth
         .login(formData)
-        .then(res => {
+        .then((res) => {
           const { token, user } = res.data
 
           setUserId(user.id)
@@ -78,7 +78,7 @@ const actions = {
 
           resolve()
         })
-        .catch(err => {
+        .catch((err) => {
           commit('AUTH_FAILURE')
 
           reject(err)
@@ -87,7 +87,7 @@ const actions = {
   },
 
   logout({ commit }) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       commit('AUTH_FAILURE', false)
       commit('SET_TOKEN', null)
 
