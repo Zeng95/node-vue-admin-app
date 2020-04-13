@@ -11,18 +11,15 @@ const getTransaction = (id) => {
 }
 
 const createTransaction = (transaction) => {
-  return httpClient.get(END_POINT, transaction)
+  return httpClient.post(END_POINT, transaction)
 }
 
-/**
- * Pass arguments to use as request parameters/data
- */
 const updateTransaction = (id, transaction) => {
-  return httpClient.get(`${END_POINT}/${id}`, transaction)
+  return httpClient.put(`${END_POINT}/${id}`, transaction)
 }
 
 const deleteTransaction = (id) => {
-  return httpClient.get(`${END_POINT}/${id}`)
+  return httpClient.delete(`${END_POINT}/${id}`)
 }
 
 export {
