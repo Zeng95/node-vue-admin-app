@@ -1,11 +1,11 @@
-/* Height */
-.h-screen {
-  height: 100vh;
-}
-
+/* LAYOUT */
 /* Top / Right / Bottom / Left */
 .top-0 {
   top: 0;
+}
+
+.top-half {
+  top: 50%;
 }
 
 .right-0 {
@@ -20,9 +20,23 @@
   left: 0;
 }
 
+.left-half {
+  left: 50%;
+}
+
 /* Z-Index */
 .z-10 {
   z-index: 10;
+}
+
+.z-50 {
+  z-index: 50;
+}
+
+/* TYPOGRAPHY */
+/* List Style Type */
+.list-none {
+  list-style-type: none;
 }
 
 /* Font Size */
@@ -52,12 +66,45 @@
 }
 
 /* Text Color */
+/* .text-red {
+  color: #e45649;
+} */
+
+.text-brown {
+  color: #986801;
+}
+
+.text-dark-green {
+  color: #50a14f;
+}
+
 .text-black {
   color: #000;
 }
 
 .text-dark-gray {
   color: #757575;
+}
+
+.text-teal {
+  color: #b8d8d8;
+}
+
+.text-green {
+  color: #d5e5a3;
+}
+
+.text-orange {
+  color: #ff8f5d;
+}
+
+.text-yellow {
+  color: #d6c1ab;
+}
+
+/* Backgrounds */
+.bg-gray {
+  background-color: #eee;
 }
 
 /* Border Color */
@@ -89,27 +136,8 @@
   transform: scale(0.65);
 }
 
-/* Z-Index */
-.z-50 {
-  z-index: 50;
-}
-
-/* Top / Right / Bottom / Left */
-.top-half {
-  top: 50%;
-}
-
-.left-half {
-  left: 50%;
-}
-
 .outline-none {
   outline: none !important;
-}
-
-/* Border Radius */
-.rounded-xl {
-  border-radius: 0.5rem;
 }
 
 /* Cursor */
