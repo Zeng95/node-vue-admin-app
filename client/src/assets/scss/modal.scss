@@ -1,0 +1,64 @@
+#modal {
+  transform: translate3d(100%, 0, 0);
+
+  &.slideInRight {
+    animation-name: slideInRight;
+    animation-duration: 0.45s;
+
+    animation-fill-mode: both;
+  }
+
+  &.slideOutRight {
+    animation-name: slideOutRight;
+    animation-duration: 0.45s;
+
+    animation-fill-mode: both;
+  }
+
+  .modal-dialog {
+    width: 400px;
+
+    .form {
+      .bv-no-focus-ring {
+        position: relative;
+
+        .dollar {
+          top: 50%;
+          padding: 0 0.8rem;
+          height: 15px;
+          border-right: 1px solid rgba(0, 0, 0, 0.1);
+          line-height: 15px;
+          transform: translate3d(0, -50%, 0);
+        }
+
+        .form-control {
+          &.hasDollar {
+            text-indent: 32px;
+          }
+        }
+      }
+    }
+  }
+
+  @keyframes slideInRight {
+    0% {
+      visibility: visible;
+      transform: translate3d(100%, 0, 0);
+    }
+
+    to {
+      transform: translateZ(0);
+    }
+  }
+
+  @keyframes slideOutRight {
+    0% {
+      transform: translateZ(0);
+    }
+
+    to {
+      visibility: hidden;
+      transform: translate3d(100%, 0, 0);
+    }
+  }
+}
