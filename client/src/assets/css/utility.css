@@ -102,40 +102,26 @@
   color: #d6c1ab;
 }
 
-/* Backgrounds */
+/* BACKGROUNDS */
+/* Background Color */
 .bg-gray {
   background-color: #eee;
 }
 
-/* Border Color */
-.border-black {
-  border-color: rgb(34, 34, 34);
-}
-
+/* BORDERS */
 /* Border Radius */
 .rounded-xl {
   border-radius: 0.5rem !important;
 }
 
-/* Rotate */
-.rotate-180 {
-  transform: rotate(180deg);
-}
-
-/* Translate */
-.-translate-x-half {
-  transform: translateX(-50%);
-}
-
+/* TRANSFORMS */
 /* Scale */
 .scale-55 {
   transform: scale(0.55);
 }
 
-.scale-65 {
-  transform: scale(0.65);
-}
-
+/* INTERACTIVITY */
+/* Outline */
 .outline-none {
   outline: none !important;
 }

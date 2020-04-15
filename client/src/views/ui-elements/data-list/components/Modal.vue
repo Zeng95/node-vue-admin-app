@@ -66,6 +66,8 @@
           v-model="$v.form.expense.$model"
           :state="validateState('expense')"
         ></b-form-input>
+
+        <b-form-invalid-feedback>请输入支出</b-form-invalid-feedback>
       </b-form-group>
 
       <!-- 收入 -->
@@ -80,6 +82,8 @@
           v-model="$v.form.income.$model"
           :state="validateState('income')"
         ></b-form-input>
+
+        <b-form-invalid-feedback>请输入收入</b-form-invalid-feedback>
       </b-form-group>
 
       <!-- 账户现金 -->
@@ -94,6 +98,8 @@
           v-model="$v.form.balance.$model"
           :state="validateState('balance')"
         ></b-form-input>
+
+        <b-form-invalid-feedback>请输入账户现金</b-form-invalid-feedback>
       </b-form-group>
 
       <!-- 备注 -->
@@ -116,7 +122,7 @@
         @click="handleSubmit"
         :disabled="isDisabled"
       >
-        <b-spinner small v-if="showSpinner"></b-spinner>
+        <b-spinner class="mr-1" small v-if="showSpinner"></b-spinner>
         提交
       </b-button>
       <b-button variant="outline-danger" @click="hideModal">取消</b-button>
@@ -254,10 +260,21 @@ export default {
         }
         await createTransaction(transaction)
 
-        this.hideModal()
-        this.$emit('refreshTable')
+        this.hideModal().then(() => {
+          this.$emit('showAlert', {
+            variant: 'success',
+            message: '新增成功'
+          })
+
+          this.$emit('refreshTable')
+        })
       } catch (error) {
-        console.log(error)
+        this.hideModal().then(() => {
+          this.$emit('showAlert', {
+            variant: 'danger',
+            message: '新增失败'
+          })
+        })
       } finally {
         this.isDisabled = false
         this.showSpinner = false
@@ -286,10 +303,21 @@ export default {
 
         await updateTransaction(transactionId, transaction)
 
-        this.hideModal()
-        this.$emit('refreshTable')
+        this.hideModal().then(() => {
+          this.$emit('showAlert', {
+            variant: 'success',
+            message: '修改成功'
+          })
+
+          this.$emit('refreshTable')
+        })
       } catch (error) {
-        console.log(error)
+        this.hideModal().then(() => {
+          this.$emit('showAlert', {
+            variant: 'danger',
+            message: '修改失败'
+          })
+        })
       } finally {
         this.isDisabled = false
         this.showSpinner = false
@@ -304,15 +332,19 @@ export default {
       modalEle.classList.add('slideInRight')
     },
     hideModal(event) {
-      if (event) event.preventDefault()
+      return new Promise((resolve) => {
+        if (event) event.preventDefault()
 
-      let modalEle = document.getElementById('modal')
-      modalEle.classList.add('slideOutRight')
+        let modalEle = document.getElementById('modal')
+        modalEle.classList.add('slideOutRight')
 
-      setTimeout(() => {
-        this.$bvModal.hide('modal')
-        this.$v.$reset()
-      }, 450)
+        setTimeout(() => {
+          this.$bvModal.hide('modal')
+          this.$v.$reset()
+
+          resolve()
+        }, 350)
+      })
     }
   }
 }

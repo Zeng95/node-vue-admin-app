@@ -69,17 +69,22 @@
                     variant="warning"
                     class="mr-3 text-xl"
                   />
-                  <span class="mb-0">确认删除该交易记录吗?</span>
+                  <span>确认要删除该交易记录吗?</span>
                 </div>
 
                 <template v-slot:modal-footer="{ cancel }">
                   <b-button
                     class="d-flex align-items-center"
                     variant="info"
-                    :disabled="isDisabled"
+                    :disabled="isBtnDisabled"
                     @click="handleDeleteTransaction(data.item._id)"
                   >
-                    <b-spinner small v-if="showSpinner"></b-spinner>确认
+                    <b-spinner
+                      class="mr-1"
+                      small
+                      v-if="showSpinner"
+                    ></b-spinner>
+                    确认
                   </b-button>
                   <b-button variant="outline-danger" @click="cancel()">
                     取消
@@ -95,6 +100,15 @@
           :item="tableItem"
           :updateTransaction="updateTransaction"
           @refreshTable="handleRefresh"
+          @showAlert="handleShowAlert"
+        />
+
+        <!-- 消息提示 -->
+        <Alert
+          :message="alertMessage"
+          :variant="alertVariant"
+          :isShow="isAlertShow"
+          @hideAlert="isAlertShow = false"
         />
       </b-card-body>
     </b-card>
@@ -110,9 +124,11 @@ import {
 } from 'bootstrap-vue'
 import { getAllTransactions, deleteTransaction } from '@/api/transactions'
 import Modal from './components/Modal'
+import Alert from '@/components/Alert'
 
 export default {
   components: {
+    Alert,
     Modal,
     BIconPlus,
     BIconTrash,
@@ -135,9 +151,12 @@ export default {
       table: [],
       tableItem: undefined,
       isTableBusy: true,
-      isDisabled: false,
+      isBtnDisabled: false,
       showSpinner: false,
-      updateTransaction: false
+      updateTransaction: false,
+      alertMessage: '',
+      alertVariant: '',
+      isAlertShow: false
     }
   },
   methods: {
@@ -148,30 +167,43 @@ export default {
 
         this.table = transactions
       } catch (err) {
-        console.log(err)
+        this.handleShowAlert({
+          variant: 'danger',
+          message: '获取失败'
+        })
       } finally {
         this.isTableBusy = false
       }
     },
     async handleDeleteTransaction(itemId) {
       try {
-        this.isDisabled = true
+        this.isBtnDisabled = true
         this.showSpinner = true
 
         await deleteTransaction(itemId)
 
         this.$bvModal.hide(itemId)
+
+        this.handleShowAlert({
+          variant: 'success',
+          message: '删除成功'
+        })
         this.handleRefresh()
       } catch (err) {
-        console.log(err)
+        this.handleShowAlert({
+          variant: 'danger',
+          message: '删除失败'
+        })
       } finally {
-        this.isDisabled = false
+        this.isBtnDisabled = false
         this.showSpinner = false
       }
     },
-    handleRefresh() {
-      this.isTableBusy = true
-      this.handlefetchTransactions()
+    handleShowAlert(options) {
+      this.alertVariant = options.variant
+      this.alertMessage = options.message
+
+      this.isAlertShow = true
     },
     handleShowModal(item) {
       if (!item.target) {
@@ -183,6 +215,10 @@ export default {
       }
 
       this.$bvModal.show('modal')
+    },
+    handleRefresh() {
+      this.isTableBusy = true
+      this.handlefetchTransactions()
     },
     formatDate(value) {
       const date = new Date(value)
