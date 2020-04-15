@@ -74,6 +74,7 @@
 
                 <template v-slot:modal-footer="{ cancel }">
                   <b-button
+                    class="d-flex align-items-center"
                     variant="info"
                     :disabled="isDisabled"
                     @click="handleDeleteTransaction(data.item._id)"

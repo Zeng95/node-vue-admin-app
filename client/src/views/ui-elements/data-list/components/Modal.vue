@@ -59,6 +59,7 @@
         <span class="dollar text-secondary position-absolute z-50">$</span>
 
         <b-form-input
+          number
           id="expense"
           class="hasDollar"
           type="number"
@@ -72,6 +73,7 @@
         <span class="dollar text-secondary position-absolute z-50">$</span>
 
         <b-form-input
+          number
           id="income"
           class="hasDollar"
           type="number"
@@ -85,6 +87,7 @@
         <span class="dollar text-secondary position-absolute z-50">$</span>
 
         <b-form-input
+          number
           id="balance"
           class="hasDollar"
           type="number"
