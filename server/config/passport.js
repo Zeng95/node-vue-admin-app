@@ -9,7 +9,7 @@ const options = {
   secretOrKey: process.env.APP_JWT_SECRET
 }
 
-module.exports = passport => {
+module.exports = (passport) => {
   passport.use(
     new JWTStrategy(options, async (jwt_payload, done) => {
       try {
@@ -22,10 +22,7 @@ module.exports = passport => {
 
         const role = await Role.findById(foundUser.role)
 
-        done(null, {
-          foundUser,
-          role
-        })
+        done(null, { foundUser, role })
       } catch (err) {
         done(err, false)
       }

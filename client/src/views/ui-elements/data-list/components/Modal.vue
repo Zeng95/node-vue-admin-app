@@ -11,9 +11,40 @@
     @shown="showModal"
     @close="hideModal"
   >
-    <template v-slot:modal-title>
-      <h5>{{ getTitle }}</h5>
-    </template>
+    <template v-slot:modal-title>{{ getTitle }}</template>
+
+    <div v-if="form.photo" class="modify-image mb-3">
+      <b-img :src="getPhotoUrl" fluid alt="Responsive image" />
+
+      <div class="actions d-flex justify-content-between mt-3">
+        <b-form-file
+          ref="file"
+          class="d-none"
+          v-model="file"
+          accept="image/*"
+          plain
+          @input="handleUploadPhoto"
+        ></b-form-file>
+        <b-button
+          class="btn-update d-flex align-items-center justify-content-center flex-fill text-info mr-3 px-4 py-2"
+          variant="transparent"
+          @click="$refs.file.$el.click()"
+          :disabled="isUploadDisabled"
+        >
+          <b-spinner class="mr-1" small v-if="showUploadSpinner"></b-spinner>
+          更新图片
+        </b-button>
+        <b-button
+          class="btn-remove d-flex align-items-center justify-content-center flex-fill text-secondary px-4 py-2"
+          variant="transparent"
+          @click="handleRemovePhoto"
+          :disabled="isDeleteDisabled"
+        >
+          <b-spinner class="mr-1" small v-if="showDeleteSpinner"></b-spinner>
+          删除图片
+        </b-button>
+      </div>
+    </div>
 
     <b-form class="form">
       <!-- 账单分类 -->
@@ -103,7 +134,7 @@
       </b-form-group>
 
       <!-- 备注 -->
-      <b-form-group label="备注" label-for="remark">
+      <b-form-group label="备注" label-for="remark" class="mb-0">
         <b-form-textarea
           trim
           id="remark"
@@ -112,7 +143,26 @@
         ></b-form-textarea>
       </b-form-group>
 
-      <b-button variant="info">上传图片</b-button>
+      <!-- 上传图片 -->
+      <div class="upload-photo mt-3" v-if="!form.photo">
+        <b-form-file
+          ref="file"
+          class="d-none"
+          v-model="file"
+          accept="image/*"
+          plain
+          @input="handleUploadPhoto"
+        ></b-form-file>
+        <b-button
+          class="d-flex align-items-center"
+          variant="info"
+          @click="$refs.file.$el.click()"
+          :disabled="isUploadDisabled"
+        >
+          <b-spinner class="mr-1" small v-if="showUploadSpinner"></b-spinner>
+          上传图片
+        </b-button>
+      </div>
     </b-form>
 
     <template v-slot:modal-footer>
@@ -120,9 +170,9 @@
         class="d-flex align-items-center"
         variant="info"
         @click="handleSubmit"
-        :disabled="isDisabled"
+        :disabled="isSubmitDisabled"
       >
-        <b-spinner class="mr-1" small v-if="showSpinner"></b-spinner>
+        <b-spinner class="mr-1" small v-if="showSubmitSpinner"></b-spinner>
         提交
       </b-button>
       <b-button variant="outline-danger" @click="hideModal">取消</b-button>
@@ -131,7 +181,12 @@
 </template>
 
 <script>
-import { createTransaction, updateTransaction } from '@/api/transactions'
+import {
+  createTransaction,
+  createTransactionPhoto,
+  updateTransaction,
+  deleteTransactionPhoto
+} from '@/api/transactions'
 import { required, numeric } from 'vuelidate/lib/validators'
 
 export default {
@@ -145,7 +200,8 @@ export default {
         expense: 0,
         income: 0,
         balance: 0,
-        remark: ''
+        remark: null,
+        photo: null
       })
     },
     updateTransaction: {
@@ -156,6 +212,15 @@ export default {
   computed: {
     getTitle() {
       return this.updateTransaction ? '编辑账单' : '新增账单'
+    },
+    getPhotoUrl() {
+      const { photo } = this.form
+
+      if (photo.url) {
+        return photo.url
+      } else {
+        return photo
+      }
     }
   },
   data() {
@@ -193,9 +258,16 @@ export default {
           ]
         }
       ],
-      isDisabled: false,
-      showSpinner: false,
-      form: this.item
+      form: this.item,
+      file: null,
+      isSubmitDisabled: false,
+      showSubmitSpinner: false,
+
+      isUploadDisabled: false,
+      showUploadSpinner: false,
+
+      isDeleteDisabled: false,
+      showDeleteSpinner: false
     }
   },
   validations: {
@@ -246,8 +318,8 @@ export default {
         // 校验不通过，退出函数
         if (this.$v.$invalid) return false
 
-        this.isDisabled = true
-        this.showSpinner = true
+        this.isSubmitDisabled = true
+        this.showSubmitSpinner = true
 
         const transaction = {
           category: this.form.category,
@@ -276,8 +348,8 @@ export default {
           })
         })
       } finally {
-        this.isDisabled = false
-        this.showSpinner = false
+        this.isSubmitDisabled = false
+        this.showSubmitSpinner = false
       }
     },
     async handleUpdateTransaction() {
@@ -287,9 +359,10 @@ export default {
         // 校验不通过，退出函数
         if (this.$v.$invalid) return false
 
-        this.isDisabled = true
-        this.showSpinner = true
+        this.isSubmitDisabled = true
+        this.showSubmitSpinner = true
 
+        const transactionId = this.form._id
         const transaction = {
           category: this.form.category,
           method: this.form.method,
@@ -297,9 +370,9 @@ export default {
           expense: this.form.expense,
           income: this.form.income,
           balance: this.form.balance,
-          remark: this.form.remark
+          remark: this.form.remark,
+          photo: this.form.photo ? this.form.photo.url : ''
         }
-        const transactionId = this.form._id
 
         await updateTransaction(transactionId, transaction)
 
@@ -319,13 +392,55 @@ export default {
           })
         })
       } finally {
-        this.isDisabled = false
-        this.showSpinner = false
+        this.isSubmitDisabled = false
+        this.showSubmitSpinner = false
       }
     },
-    validateState(name) {
-      const { $dirty, $error } = this.$v.form[name]
-      return $dirty ? !$error : null
+    async handleUploadPhoto() {
+      try {
+        this.isUploadDisabled = true
+        this.showUploadSpinner = true
+
+        const formData = new FormData()
+        formData.append('photo', this.file)
+
+        const result = await createTransactionPhoto(formData)
+        const { photo } = result.data
+
+        this.$set(this.form, 'photo', photo)
+      } catch (err) {
+        this.hideModal().then(() => {
+          this.$emit('showAlert', {
+            variant: 'danger',
+            message: err
+          })
+        })
+      } finally {
+        this.isUploadDisabled = false
+        this.showUploadSpinner = false
+      }
+    },
+    async handleRemovePhoto() {
+      try {
+        this.isDeleteDisabled = true
+        this.showDeleteSpinner = true
+
+        await deleteTransactionPhoto({
+          data: { filename: this.form.photo.filename }
+        })
+
+        this.$set(this.form, 'photo', null)
+      } catch (err) {
+        this.hideModal().then(() => {
+          this.$emit('showAlert', {
+            variant: 'danger',
+            message: '删除失败'
+          })
+        })
+      } finally {
+        this.isDeleteDisabled = false
+        this.showDeleteSpinner = false
+      }
     },
     showModal() {
       let modalEle = document.getElementById('modal')
@@ -343,8 +458,12 @@ export default {
           this.$v.$reset()
 
           resolve()
-        }, 350)
+        }, 450)
       })
+    },
+    validateState(name) {
+      const { $dirty, $error } = this.$v.form[name]
+      return $dirty ? !$error : null
     }
   }
 }

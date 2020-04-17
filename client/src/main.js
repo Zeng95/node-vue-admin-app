@@ -6,7 +6,6 @@ import store from './store'
 import '@babel/polyfill'
 import 'mutationobserver-shim'
 import './plugins/bootstrap-vue'
-import './assets/sass/custom.scss'
 
 Vue.use(Vuelidate)
 Vue.config.productionTip = false

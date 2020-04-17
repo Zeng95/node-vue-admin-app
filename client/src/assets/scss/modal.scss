@@ -3,20 +3,38 @@
 
   &.slideInRight {
     animation-name: slideInRight;
-    animation-duration: 0.35s;
+    animation-duration: 0.45s;
 
     animation-fill-mode: both;
   }
 
   &.slideOutRight {
     animation-name: slideOutRight;
-    animation-duration: 0.35s;
+    animation-duration: 0.45s;
 
     animation-fill-mode: both;
   }
 
   .modal-dialog {
     width: 400px;
+
+    .modify-image {
+      .btn {
+        transition: all 0.2s ease;
+
+        &.btn-update {
+          &:hover {
+            background-color: rgba(23, 162, 184, 0.08);
+          }
+        }
+
+        &.btn-remove {
+          &:hover {
+            background-color: rgba(108, 117, 125, 0.08);
+          }
+        }
+      }
+    }
 
     .form {
       .bv-no-focus-ring {

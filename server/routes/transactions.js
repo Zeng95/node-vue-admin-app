@@ -2,39 +2,68 @@ const express = require('express')
 const router = express.Router()
 const controller = require('../controllers/transactions')
 
-/**
- * 获取所有交易纪录
- *
- * @access Private
- */
-router.get('/transactions', controller.getAllTransactions)
+const {
+  upload,
+  handleUploadPhoto,
+  handleDeletePhoto
+} = require('../middlewares/upload-photo')
+const { verifyToken } = require('../middlewares/verify-token')
 
 /**
- * 获取指定交易纪录
+ * 获取所有交易记录
  *
  * @access Private
  */
-router.get('/transactions/:id', controller.getTransaction)
+router.get('/transactions', verifyToken, controller.getAllTransactions)
 
 /**
- * 新增交易纪录
+ * 获取指定交易记录
  *
  * @access Private
  */
-router.post('/transactions', controller.createTransaction)
+router.get('/transactions/:id', verifyToken, controller.getTransaction)
 
 /**
- * 修改指定交易纪录
+ * 创建新的交易记录
  *
  * @access Private
  */
-router.put('/transactions/:id', controller.updateTransaction)
+router.post('/transactions', verifyToken, controller.createTransaction)
 
 /**
- * 删除指定交易纪录
+ * 创建新的交易记录的图片
  *
  * @access Private
  */
-router.delete('/transactions/:id', controller.deleteTransaction)
+router.post(
+  '/transactions/upload/photo',
+  [verifyToken, upload.single('photo'), handleUploadPhoto],
+  controller.createTransactionPhoto
+)
+
+/**
+ * 修改指定交易记录
+ *
+ * @access Private
+ */
+router.put('/transactions/:id', verifyToken, controller.updateTransaction)
+
+/**
+ * 删除指定交易记录
+ *
+ * @access Private
+ */
+router.delete('/transactions/:id', verifyToken, controller.deleteTransaction)
+
+/**
+ * 删除指定交易记录的图片
+ *
+ * @access Private
+ */
+router.delete(
+  '/transactions/upload/photo',
+  [verifyToken, handleDeletePhoto],
+  controller.deleteTransactionPhoto
+)
 
 module.exports = router
