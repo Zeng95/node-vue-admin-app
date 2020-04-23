@@ -23,6 +23,10 @@ html {
   font-size: 0.875rem;
 }
 
+:focus {
+  outline: none !important;
+}
+
 .form-control,
 .custom-select {
   transition: box-shadow 0.3s ease;

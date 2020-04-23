@@ -2,12 +2,12 @@ import httpClient from './httpClient'
 
 const END_POINT = '/transactions'
 
-const getAllTransactions = () => {
-  return httpClient.get(END_POINT)
-}
-
 const getTransaction = (id) => {
   return httpClient.get(`${END_POINT}/${id}`)
+}
+
+const getAllTransactions = (page, size) => {
+  return httpClient.get(`${END_POINT}?pageNumber=${page}&pageSize=${size}`)
 }
 
 const createTransactionPhoto = (photo) => {
@@ -26,6 +26,10 @@ const deleteTransaction = (id) => {
   return httpClient.delete(`${END_POINT}/${id}`)
 }
 
+const deleteManyTransaction = (ids) => {
+  return httpClient.delete(END_POINT, ids)
+}
+
 const deleteTransactionPhoto = (photo) => {
   return httpClient.delete(`${END_POINT}/upload/photo`, photo)
 }
@@ -37,5 +41,6 @@ export {
   createTransaction,
   updateTransaction,
   deleteTransaction,
+  deleteManyTransaction,
   deleteTransactionPhoto
 }

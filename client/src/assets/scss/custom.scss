@@ -18,3 +18,13 @@ $enable-shadows: false;
 $body-bg: #f6f6f6;
 $component-active-bg: #17a2b8;
 $border-radius: 0.3rem;
+
+$pagination-color: var(--gray-900);
+$pagination-bg: #f4f4f5;
+$pagination-border-width: 0px;
+
+$pagination-hover-color: var(--info);
+$pagination-hover-bg: #f4f4f5;
+
+$pagination-disabled-color: #c0c4cc;
+$pagination-disabled-bg: #f4f4f5;

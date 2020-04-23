@@ -13,8 +13,8 @@
   >
     <template v-slot:modal-title>{{ getTitle }}</template>
 
-    <div v-if="form.photo" class="modify-image mb-3">
-      <b-img :src="getPhotoUrl" fluid alt="Responsive image" />
+    <div v-if="form && form.photo" class="modify-image mb-3 text-center">
+      <b-img :src="getPhotoUrl" fluid />
 
       <div class="actions d-flex justify-content-between mt-3">
         <b-form-file
@@ -204,14 +204,14 @@ export default {
         photo: null
       })
     },
-    updateTransaction: {
+    isUpdate: {
       type: Boolean,
       required: true
     }
   },
   computed: {
     getTitle() {
-      return this.updateTransaction ? '编辑账单' : '新增账单'
+      return this.isUpdate ? '编辑账单' : '新增账单'
     },
     getPhotoUrl() {
       const { photo } = this.form
@@ -258,7 +258,7 @@ export default {
           ]
         }
       ],
-      form: this.item,
+      form: { ...this.item },
       file: null,
       isSubmitDisabled: false,
       showSubmitSpinner: false,
@@ -267,7 +267,9 @@ export default {
       showUploadSpinner: false,
 
       isDeleteDisabled: false,
-      showDeleteSpinner: false
+      showDeleteSpinner: false,
+
+      resetForm: false
     }
   },
   validations: {
@@ -303,7 +305,7 @@ export default {
   },
   methods: {
     handleSubmit() {
-      if (this.updateTransaction) {
+      if (this.isUpdate) {
         // 更新已获取的交易记录
         this.handleUpdateTransaction()
       } else {
@@ -328,10 +330,12 @@ export default {
           expense: this.form.expense,
           income: this.form.income,
           balance: this.form.balance,
-          remark: this.form.remark
+          remark: this.form.remark,
+          photo: this.form.photo ? this.form.photo.url : ''
         }
         await createTransaction(transaction)
 
+        this.resetForm = true
         this.hideModal().then(() => {
           this.$emit('showAlert', {
             variant: 'success',
@@ -455,7 +459,27 @@ export default {
 
         setTimeout(() => {
           this.$bvModal.hide('modal')
-          this.$v.$reset()
+
+          if (this.resetForm) {
+            // this.form = {
+            //   category: null,
+            //   method: '',
+            //   description: '',
+            //   expense: 0,
+            //   income: 0,
+            //   balance: 0,
+            //   remark: null,
+            //   photo: null
+            // }
+
+            this.form.category = null
+            this.resetForm = false
+          }
+
+          this.$nextTick(() => {
+            this.$v.$reset()
+            this.$v.form.$reset()
+          })
 
           resolve()
         }, 450)
