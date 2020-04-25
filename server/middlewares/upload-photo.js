@@ -24,9 +24,9 @@ const storage = multer.diskStorage({
   }
 })
 
-const upload = multer({ storage })
+const uploadSingle = multer({ storage })
 
-const handleUploadPhoto = async (req, res, next) => {
+const uploadPhoto = async (req, res, next) => {
   try {
     if (req.file) {
       const name = `images/${req.file.filename}`
@@ -45,7 +45,7 @@ const handleUploadPhoto = async (req, res, next) => {
   }
 }
 
-const handleDeletePhoto = async (req, res, next) => {
+const DeletePhoto = async (req, res, next) => {
   try {
     const name = `images/${req.body.filename}`
 
@@ -58,4 +58,4 @@ const handleDeletePhoto = async (req, res, next) => {
   }
 }
 
-module.exports = { upload, handleUploadPhoto, handleDeletePhoto }
+module.exports = { uploadSingle, uploadPhoto, DeletePhoto }

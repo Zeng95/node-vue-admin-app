@@ -1,12 +1,12 @@
 <template>
   <b-modal
     centered
-    v-model="isModalShow"
+    v-model="showModal"
     content-class="rounded-xl"
     header-class="border-bottom-0"
     footer-class="border-top-0"
     title="提示"
-    @hide="handleCancel"
+    @hide="hideModal"
   >
     <div class="d-flex align-items-center">
       <b-icon-exclamation-circle-fill variant="warning" class="mr-3 text-xl" />
@@ -23,7 +23,7 @@
         <b-spinner class="mr-1" small v-if="showSpinner"></b-spinner>
         <span>确认</span>
       </b-button>
-      <b-button variant="outline-danger" @click="handleCancel()">
+      <b-button variant="outline-danger" @click="hideModal()">
         <span>取消</span>
       </b-button>
     </template>
@@ -32,7 +32,7 @@
 
 <script>
 import { BIconExclamationCircleFill } from 'bootstrap-vue'
-import { deleteTransaction, deleteManyTransaction } from '@/api/transactions'
+import { deleteTransaction, deleteManyTransactions } from '@/api/transactions'
 
 export default {
   components: {
@@ -45,21 +45,21 @@ export default {
         return []
       }
     },
-    modalShow: {
+    modalStatus: {
       type: Boolean,
       required: true
     }
   },
   data() {
     return {
-      isModalShow: this.modalShow,
       isBtnDisabled: false,
+      showModal: this.modalStatus,
       showSpinner: false
     }
   },
   watch: {
-    modalShow(val) {
-      this.isModalShow = val
+    modalStatus(val) {
+      this.showModal = val
     }
   },
   methods: {
@@ -71,7 +71,7 @@ export default {
         if (this.ids.length === 1) {
           await deleteTransaction(this.ids)
         } else {
-          await deleteManyTransaction(this.ids)
+          await deleteManyTransactions(this.ids)
         }
 
         this.$bvModal.hide()
@@ -91,8 +91,8 @@ export default {
         this.showSpinner = false
       }
     },
-    handleCancel() {
-      this.$emit('cancel')
+    hideModal() {
+      this.$emit('close')
     }
   }
 }

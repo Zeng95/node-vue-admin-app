@@ -1,43 +1,92 @@
 <template>
   <div id="data-list-thumb-view">
+    <h2 class="page-title text-secondary">Thumb View</h2>
+
     <b-card no-body class="rounded-xl shadow">
       <!-- 头部 -->
-      <b-card-header class="d-flex justify-content-between rounded-0">
-        <div class="card-header-title">
-          <h4 class="mb-0 text-info">Thumb View</h4>
-        </div>
+      <b-card-header
+        header-class="rounded-0 border-bottom-0 pb-0"
+        header-bg-variant="transparent"
+        header-text-variant="info"
+      >
+        <b-card-title title="Table Styles" class="mb-0"></b-card-title>
       </b-card-header>
 
       <!-- 内容 -->
       <b-card-body>
         <!-- 表单 -->
         <b-form inline class="form">
-          <!-- 搜索框 -->
-          <b-form-input type="search"></b-form-input>
+          <!-- 搜索 -->
+          <div class="filter-search d-flex">
+            <!-- 搜索框 -->
+            <b-input-group>
+              <b-form-input
+                trim
+                lazy
+                v-model="filter"
+                type="search"
+                placeholder="账单分类"
+              ></b-form-input>
+              <b-input-group-append>
+                <b-button
+                  variant="info"
+                  :disabled="!filter"
+                  :class="{ 'cursor-not-allowed': !filter }"
+                  @click="filter = ''"
+                >
+                  清空
+                </b-button>
+              </b-input-group-append>
+            </b-input-group>
 
-          <!-- 按钮 -->
-          <div class="d-flex ml-auto">
+            <!-- 搜索按钮 -->
             <b-button
-              variant="outline-info"
-              class="mr-3"
-              :class="{ 'cursor-not-allowed': !allSelected }"
-              :disabled="!allSelected"
-              @click.stop="modalShow = true"
+              variant="info"
+              class="btn-search d-flex align-items-center text-base"
+              @click="onSearch"
             >
-              批量删除
-            </b-button>
-
-            <b-button
-              variant="outline-info"
-              class="d-flex align-items-center"
-              @click="handleShowModal"
-            >
-              <b-icon-plus></b-icon-plus>添加
+              <b-icon-search class="mr-2" />
+              <span>搜索</span>
             </b-button>
           </div>
 
-          <!-- 对话框 -->
-          <DeleteModal :modalShow="modalShow" @cancel="modalShow = false" />
+          <!-- 按钮操作 -->
+          <div class="filter-items d-flex ml-auto">
+            <!-- 批量删除 -->
+            <b-button
+              variant="info"
+              :class="{ 'cursor-not-allowed': !allSelected }"
+              :disabled="!allSelected"
+              @click="showDeleteModal = true"
+            >
+              <span>批量删除</span>
+            </b-button>
+
+            <!-- 添加 -->
+            <b-button
+              variant="info"
+              class="btn-add d-flex align-items-center"
+              @click="showModal"
+            >
+              <b-icon-file-earmark-plus class="mr-2" />
+              <span>添加</span>
+            </b-button>
+
+            <b-button
+              variant="info"
+              class="btn-export d-flex align-items-center"
+              @click="showModal"
+            >
+              <b-icon-file-earmark-arrow-down class="mr-2" />
+              <span>导出</span>
+            </b-button>
+          </div>
+
+          <!-- 提示 DeleteModal -->
+          <DeleteModal
+            :modalStatus="showDeleteModal"
+            @close="showDeleteModal = false"
+          />
         </b-form>
 
         <!-- 表格 -->
@@ -45,6 +94,10 @@
           hover
           fixed
           selectable
+          show-empty
+          empty-text="暂无数据"
+          no-provider-sorting
+          thead-class="bg-light-gray"
           v-model="tableValues"
           :items="fetchTransactions"
           :fields="fields"
@@ -55,6 +108,7 @@
           ref="table"
           class="text-center mb-0"
           @row-selected="onRowSelected"
+          @sort-changed="onSortChanged"
         >
           <template v-slot:table-busy>
             <div class="loading text-center text-info">
@@ -63,12 +117,16 @@
           </template>
 
           <template v-slot:head(selected)>
-            <b-form-checkbox v-model="allSelected" @change="toggleSelected" />
+            <b-checkbox v-model="allSelected" @change="toggleAllRows" />
           </template>
 
           <template v-slot:cell(selected)="data">
-            <b-form-checkbox-group v-model="selectedItems">
-              <b-form-checkbox :value="data.item._id"></b-form-checkbox>
+            <b-form-checkbox-group v-model="selectedItems" stacked>
+              <b-checkbox
+                :value="data.item._id"
+                class="mr-0"
+                @change="selectRow(data)"
+              />
             </b-form-checkbox-group>
           </template>
 
@@ -84,20 +142,20 @@
             <div>
               <!-- 编辑 -->
               <b-icon-pencil-square
-                class="cursor-pointer"
-                @click.stop="handleShowModal(data.item)"
+                class="cursor-pointer mr-2"
+                @click.stop="showModal(data.item)"
               />
 
               <!-- 删除 -->
               <b-icon-trash
-                class="cursor-pointer ml-2"
+                class="cursor-pointer"
                 @click.stop="data.item.modalShow = true"
               />
 
-              <!-- 提示 SaveModal -->
+              <!-- 提示 DeleteModal -->
               <DeleteModal
-                :modalShow="data.item.modalShow"
-                @cancel="data.item.modalShow = false"
+                :modalStatus="data.item.modalShow"
+                @close="data.item.modalShow = false"
               />
             </div>
           </template>
@@ -161,16 +219,16 @@
         <SaveModal
           :item="tableItem"
           :isUpdate="isUpdate"
-          @refreshTable="handleRefresh"
-          @showAlert="handleShowAlert"
+          @refreshTable="onRefresh"
+          @showAlert="showAlert"
         />
 
         <!-- 消息提示 -->
         <Alert
           :message="alertMessage"
           :variant="alertVariant"
-          :isShow="isAlertShow"
-          @hideAlert="isAlertShow = false"
+          :isShow="showDismissibleAlert"
+          @hideAlert="showDismissibleAlert = false"
         />
       </b-card-body>
     </b-card>
@@ -178,8 +236,17 @@
 </template>
 
 <script>
-import { BIconPlus, BIconTrash, BIconPencilSquare } from 'bootstrap-vue'
-import { getAllTransactions } from '@/api/transactions'
+import {
+  BIconTrash,
+  BIconSearch,
+  BIconPencilSquare,
+  BIconFileEarmarkPlus,
+  BIconFileEarmarkArrowDown
+} from 'bootstrap-vue'
+import {
+  getAllTransactions,
+  getTransactionByCategory
+} from '@/api/transactions'
 import Alert from '@/components/Alert'
 import SaveModal from './components/SaveModal'
 import DeleteModal from './components/DeleteModal'
@@ -190,9 +257,11 @@ export default {
     Alert,
     SaveModal,
     DeleteModal,
-    BIconPlus,
     BIconTrash,
-    BIconPencilSquare
+    BIconSearch,
+    BIconPencilSquare,
+    BIconFileEarmarkPlus,
+    BIconFileEarmarkArrowDown
   },
   computed: {
     numberOfPages() {
@@ -211,47 +280,66 @@ export default {
         {
           key: 'selected',
           label: '',
-          sortable: false,
-          class: 'a',
-          tdClass: 'align-middle'
+          tdClass: 'align-middle',
+          thClass: ['border-top-0', 'border-bottom']
         },
-        { key: 'photo', label: '图片' },
+        {
+          key: 'photo',
+          label: '图片',
+          thClass: ['border-top-0', 'border-bottom']
+        },
         {
           key: 'method',
           label: '付款方式',
           sortable: true,
-          tdClass: 'align-middle'
+          tdClass: 'align-middle',
+          thClass: ['border-top-0', 'border-bottom']
         },
-        { key: 'category', label: '账单分类', tdClass: 'align-middle' },
+        {
+          key: 'category',
+          label: '账单分类',
+          tdClass: 'align-middle',
+          thClass: ['border-top-0', 'border-bottom']
+        },
         {
           key: 'description',
           label: '收支描述',
-          tdClass: ['text-truncate', 'align-middle']
+          tdClass: ['text-truncate', 'align-middle'],
+          thClass: ['border-top-0', 'border-bottom']
         },
         {
           key: 'expense',
           label: '支出',
           sortable: true,
-          tdClass: 'align-middle'
+          tdClass: 'align-middle',
+          thClass: ['border-top-0', 'border-bottom']
         },
         {
           key: 'income',
           label: '收入',
           sortable: true,
-          tdClass: 'align-middle'
+          tdClass: 'align-middle',
+          thClass: ['border-top-0', 'border-bottom']
         },
         {
           key: 'balance',
           label: '账户现金',
           sortable: true,
-          tdClass: 'align-middle'
+          tdClass: 'align-middle',
+          thClass: ['border-top-0', 'border-bottom']
         },
         {
           key: 'remark',
           label: '备注',
-          tdClass: ['text-truncate', 'align-middle']
+          tdClass: ['text-truncate', 'align-middle'],
+          thClass: ['border-top-0', 'border-bottom']
         },
-        { key: 'actions', label: '操作', tdClass: 'align-middle' }
+        {
+          key: 'actions',
+          label: '操作',
+          tdClass: 'align-middle',
+          thClass: ['border-top-0', 'border-bottom']
+        }
       ],
       tableItem: undefined,
       tableValues: [],
@@ -261,9 +349,14 @@ export default {
       // 是否勾选所有的表格行
       allSelected: false,
 
+      // 当前显示页
       currentPage: 1,
+      // 每页显示行数
       perPage: 20,
+      // 总行数
       totalRows: 0,
+
+      filter: null,
 
       isTableBusy: false,
       isUpdate: false,
@@ -272,7 +365,7 @@ export default {
 
       alertMessage: '',
       alertVariant: '',
-      isAlertShow: false,
+      showDismissibleAlert: false,
 
       dropdownDefault: '20条/页',
       dropdownItems: [
@@ -298,7 +391,7 @@ export default {
         }
       ],
 
-      modalShow: false
+      showDeleteModal: false
     }
   },
   methods: {
@@ -318,7 +411,7 @@ export default {
 
         return items
       } catch (err) {
-        this.handleShowAlert({
+        this.showAlert({
           variant: 'danger',
           message: '获取失败'
         })
@@ -326,6 +419,23 @@ export default {
         return []
       }
     },
+
+    // 表格搜索
+    async onSearch() {
+      if (this.filter) {
+        await getTransactionByCategory(this.filter)
+      }
+    },
+    // 表格刷新
+    onRefresh() {
+      this.$refs.table.refresh()
+
+      this.fetchTransactions({
+        currentPage: this.currentPage,
+        perPage: this.perPage
+      })
+    },
+    // 表格行通过 Click 事件选中
     onRowSelected(items) {
       const selectedItemsLen = this.selectedItems.length
 
@@ -362,13 +472,30 @@ export default {
         this.selectedItems = []
       }
     },
-    toggleSelected() {
+    // 表格排序
+    onSortChanged() {
+      this.isTableBusy = true
+
+      setTimeout(() => {
+        this.isTableBusy = false
+      }, 500)
+    },
+    // 表格行通过 Checkbox 多选框选中
+    selectRow(item) {
+      if (!item.rowSelected) {
+        this.$refs.table.selectRow(item.index)
+      } else {
+        this.$refs.table.unselectRow(item.index)
+      }
+    },
+    toggleAllRows() {
       this.allSelected = !this.allSelected
 
       if (this.allSelected) {
         this.$refs.table.selectAllRows()
       } else {
         this.$refs.table.clearSelected()
+        this.selectedItems = []
       }
     },
 
@@ -392,13 +519,13 @@ export default {
       }
     },
 
-    handleShowAlert(options) {
+    showAlert(options) {
       this.alertVariant = options.variant
       this.alertMessage = options.message
 
-      this.isAlertShow = true
+      this.showAlert = true
     },
-    handleShowModal(item) {
+    showModal(item) {
       if (!item.target) {
         this.tableItem = item
         this.isUpdate = true
@@ -408,14 +535,6 @@ export default {
       }
 
       this.$bvModal.show('modal')
-    },
-    handleRefresh() {
-      this.$refs.table.refresh()
-
-      this.fetchTransactions({
-        currentPage: this.currentPage,
-        perPage: this.perPage
-      })
     },
 
     formatDate(value) {
@@ -462,8 +581,23 @@ export default {
 
 <style lang="scss" scoped>
 #data-list-thumb-view {
+  .page-title {
+    margin-bottom: 30px;
+  }
+
   .form {
     padding-bottom: 1.25rem;
+
+    .btn-search,
+    .btn-add,
+    .btn-export {
+      margin-left: 17.5px;
+    }
+
+    .bi-search {
+      width: 14px;
+      height: 14px;
+    }
   }
 
   .table {

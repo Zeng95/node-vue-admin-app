@@ -1,5 +1,5 @@
 {
-  "name": "admin-app-server",
+  "name": "admin-dashboard-server",
   "version": "0.1.0",
   "main": "app.js",
   "scripts": {

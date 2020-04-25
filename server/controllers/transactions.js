@@ -1,34 +1,8 @@
-const passport = require('passport')
 const Transaction = require('../models/transaction')
-
-exports.getAllTransactions = async (req, res) => {
-  try {
-    // 查询数据库
-    // 异步操作
-    const foundTransactions = await Transaction.find()
-
-    if (!foundTransactions) {
-      return res.status(404).json({
-        success: false,
-        message: '交易记录不存在'
-      })
-    }
-
-    res.status(200).json({
-      success: true,
-      transactions: foundTransactions
-    })
-  } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: err.message
-    })
-  }
-}
 
 exports.getTransaction = async (req, res) => {
   try {
-    // 通过 Id 查询数据库
+    // 通过 id 查询数据库
     // 异步操作
     const foundTransaction = await Transaction.findById(req.params.id)
 
@@ -42,6 +16,70 @@ exports.getTransaction = async (req, res) => {
     res.status(200).json({
       success: true,
       transaction: foundTransaction
+    })
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: err.message
+    })
+  }
+}
+
+exports.getTransactionByCategory = async (req, res) => {
+  try {
+    // 通过 category 查询数据库
+    // 异步操作
+    const foundTransaction = await Transaction.find({
+      category: req.query.category
+    })
+
+    if (foundTransaction.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: '交易记录不存在'
+      })
+    }
+
+    res.status(200).json({
+      success: true,
+      transaction: foundTransaction
+    })
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: err.message
+    })
+  }
+}
+
+exports.getAllTransactions = async (req, res) => {
+  try {
+    const currentPage = Number(req.query.pageNumber)
+    const pageLimit = Number(req.query.pageSize)
+
+    // 查询数据库
+    // 异步操作
+    const foundTransactions = await Transaction.find()
+      .skip(pageLimit * currentPage - pageLimit)
+      .limit(pageLimit)
+
+    const numOfTransactions = await Transaction.estimatedDocumentCount()
+
+    if (!foundTransactions) {
+      return res.status(404).json({
+        success: false,
+        message: '交易记录不存在'
+      })
+    }
+
+    res.status(200).json({
+      success: true,
+      data: {
+        transactions: foundTransactions,
+        pageNumber: currentPage,
+        pageSize: pageLimit,
+        totalCount: numOfTransactions
+      }
     })
   } catch (err) {
     res.status(500).json({
@@ -106,6 +144,38 @@ exports.updateTransaction = async (req, res) => {
 exports.deleteTransaction = async (req, res) => {
   try {
     await Transaction.findByIdAndRemove(req.params.id)
+
+    res.status(200).json({
+      success: true,
+      message: '删除成功'
+    })
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: err.message
+    })
+  }
+}
+
+exports.deleteManyTransactions = async (req, res) => {
+  try {
+    // await Transaction.deleteMany({})
+
+    res.status(200).json({
+      success: true,
+      message: '删除成功'
+    })
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: err.message
+    })
+  }
+}
+
+exports.deleteAllTransactions = async (req, res) => {
+  try {
+    await Transaction.deleteMany({})
 
     res.status(200).json({
       success: true,

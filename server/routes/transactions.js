@@ -3,11 +3,29 @@ const router = express.Router()
 const controller = require('../controllers/transactions')
 
 const {
-  upload,
-  handleUploadPhoto,
-  handleDeletePhoto
+  uploadSingle,
+  uploadPhoto,
+  DeletePhoto
 } = require('../middlewares/upload-photo')
 const { verifyToken } = require('../middlewares/verify-token')
+
+/**
+ * 通过 category 获取交易记录
+ *
+ * @access Private
+ */
+router.get(
+  '/transactions/search',
+  verifyToken,
+  controller.getTransactionByCategory
+)
+
+/**
+ * 通过 id 获取交易记录
+ *
+ * @access Private
+ */
+router.get('/transactions/:id', verifyToken, controller.getTransaction)
 
 /**
  * 获取所有交易记录
@@ -15,13 +33,6 @@ const { verifyToken } = require('../middlewares/verify-token')
  * @access Private
  */
 router.get('/transactions', verifyToken, controller.getAllTransactions)
-
-/**
- * 获取指定交易记录
- *
- * @access Private
- */
-router.get('/transactions/:id', verifyToken, controller.getTransaction)
 
 /**
  * 创建新的交易记录
@@ -37,7 +48,7 @@ router.post('/transactions', verifyToken, controller.createTransaction)
  */
 router.post(
   '/transactions/upload/photo',
-  [verifyToken, upload.single('photo'), handleUploadPhoto],
+  [verifyToken, uploadSingle.single('photo'), uploadPhoto],
   controller.createTransactionPhoto
 )
 
@@ -56,13 +67,27 @@ router.put('/transactions/:id', verifyToken, controller.updateTransaction)
 router.delete('/transactions/:id', verifyToken, controller.deleteTransaction)
 
 /**
+ * 删除多个交易记录
+ *
+ * @access Private
+ */
+router.delete('/transactions', verifyToken, controller.deleteManyTransactions)
+
+/**
+ * 删除所有交易记录
+ *
+ * @access Private
+ */
+router.delete('/transactions', verifyToken, controller.deleteAllTransactions)
+
+/**
  * 删除指定交易记录的图片
  *
  * @access Private
  */
 router.delete(
   '/transactions/upload/photo',
-  [verifyToken, handleDeletePhoto],
+  [verifyToken, DeletePhoto],
   controller.deleteTransactionPhoto
 )
 
