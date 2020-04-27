@@ -17,37 +17,27 @@
         <!-- 表单 -->
         <b-form inline class="form">
           <!-- 搜索 -->
-          <div class="filter-search d-flex">
+          <div class="search-box">
             <!-- 搜索框 -->
-            <b-input-group>
-              <b-form-input
+            <b-input-group class="input-group-search">
+              <b-form-select
                 trim
                 lazy
                 v-model="filter"
-                type="search"
-                placeholder="账单分类"
-              ></b-form-input>
+                :options="categories"
+              ></b-form-select>
+
               <b-input-group-append>
                 <b-button
                   variant="info"
                   :disabled="!filter"
                   :class="{ 'cursor-not-allowed': !filter }"
-                  @click="filter = ''"
+                  @click="filter = null"
                 >
                   清空
                 </b-button>
               </b-input-group-append>
             </b-input-group>
-
-            <!-- 搜索按钮 -->
-            <b-button
-              variant="info"
-              class="btn-search d-flex align-items-center text-base"
-              @click="onSearch"
-            >
-              <b-icon-search class="mr-2" />
-              <span>搜索</span>
-            </b-button>
           </div>
 
           <!-- 按钮操作 -->
@@ -68,24 +58,29 @@
               class="btn-add d-flex align-items-center"
               @click="showModal"
             >
-              <b-icon-file-earmark-plus class="mr-2" />
+              <b-icon-file-earmark-plus class="mr-1" />
               <span>添加</span>
             </b-button>
 
+            <!-- 导出 -->
             <b-button
+              title="导出 CSV"
               variant="info"
               class="btn-export d-flex align-items-center"
-              @click="showModal"
+              @click="onExport"
             >
-              <b-icon-file-earmark-arrow-down class="mr-2" />
+              <b-icon-file-earmark-text class="mr-1" />
               <span>导出</span>
             </b-button>
           </div>
 
-          <!-- 提示 DeleteModal -->
+          <!-- 删除 DeleteModal -->
           <DeleteModal
-            :modalStatus="showDeleteModal"
-            @close="showDeleteModal = false"
+            :ids="selectedItems"
+            :modalVisible="showDeleteModal"
+            @refresh="onRefresh"
+            @showAlert="showAlert"
+            @hideModal="showDeleteModal = false"
           />
         </b-form>
 
@@ -93,25 +88,29 @@
         <b-table
           hover
           fixed
+          striped
           selectable
           show-empty
           empty-text="暂无数据"
+          empty-filtered-text="暂无数据"
           no-provider-sorting
-          thead-class="bg-light-gray"
+          no-provider-filtering
           v-model="tableValues"
           :items="fetchTransactions"
           :fields="fields"
           :busy.sync="isTableBusy"
           :per-page="perPage"
           :current-page="currentPage"
+          :filter="filter"
           id="table"
           ref="table"
           class="text-center mb-0"
           @row-selected="onRowSelected"
           @sort-changed="onSortChanged"
+          @filtered="onSearch"
         >
           <template v-slot:table-busy>
-            <div class="loading text-center text-info">
+            <div class="loading text-center text-info my-2">
               <b-spinner type="grow" class="align-middle"></b-spinner>
             </div>
           </template>
@@ -149,13 +148,16 @@
               <!-- 删除 -->
               <b-icon-trash
                 class="cursor-pointer"
-                @click.stop="data.item.modalShow = true"
+                @click.stop="data.item.showDeleteModal = true"
               />
 
-              <!-- 提示 DeleteModal -->
+              <!-- 删除 DeleteModal -->
               <DeleteModal
-                :modalStatus="data.item.modalShow"
-                @close="data.item.modalShow = false"
+                :ids="[data.item._id]"
+                :modalVisible="data.item.showDeleteModal"
+                @refresh="onRefresh"
+                @showAlert="showAlert"
+                @hideModal="data.item.showDeleteModal = false"
               />
             </div>
           </template>
@@ -215,11 +217,11 @@
           </div>
         </div>
 
-        <!-- 对话框 -->
+        <!-- 保存 SaveModal -->
         <SaveModal
           :item="tableItem"
           :isUpdate="isUpdate"
-          @refreshTable="onRefresh"
+          @refresh="onRefresh"
           @showAlert="showAlert"
         />
 
@@ -238,14 +240,14 @@
 <script>
 import {
   BIconTrash,
-  BIconSearch,
   BIconPencilSquare,
   BIconFileEarmarkPlus,
-  BIconFileEarmarkArrowDown
+  BIconFileEarmarkText
 } from 'bootstrap-vue'
 import {
   getAllTransactions,
-  getTransactionByCategory
+  getTransactionsByCategory,
+  exportAllTransactions
 } from '@/api/transactions'
 import Alert from '@/components/Alert'
 import SaveModal from './components/SaveModal'
@@ -258,10 +260,9 @@ export default {
     SaveModal,
     DeleteModal,
     BIconTrash,
-    BIconSearch,
     BIconPencilSquare,
     BIconFileEarmarkPlus,
-    BIconFileEarmarkArrowDown
+    BIconFileEarmarkText
   },
   computed: {
     numberOfPages() {
@@ -275,69 +276,104 @@ export default {
   },
   data() {
     return {
+      // 账单分类
+      categories: [
+        {
+          label: '消费',
+          options: [
+            { value: null, text: '账单分类' },
+            { value: '餐饮美食', text: '餐饮美食' },
+            { value: '服饰美容', text: '服饰美容' },
+            { value: '生活日常', text: '生活日常' },
+            { value: '日常缴费', text: '日常缴费' },
+            { value: '交通出行', text: '交通出行' },
+            { value: '通讯物流', text: '通讯物流' },
+            { value: '休闲娱乐', text: '休闲娱乐' },
+            { value: '医疗保健', text: '医疗保健' },
+            { value: '住房物业', text: '住房物业' },
+            { value: '文体教育', text: '文体教育' },
+            { value: '其他', text: '其他' }
+          ]
+        },
+        {
+          label: '更多',
+          options: [
+            { value: '投资理财', text: '投资理财' },
+            { value: '金融保险', text: '金融保险' },
+            { value: '信用借还', text: '信用借还' },
+            { value: '人情往来', text: '人情往来' },
+            { value: '公益慈善', text: '公益慈善' },
+            { value: '经营所得', text: '经营所得' },
+            { value: '职业酬劳', text: '职业酬劳' },
+            { value: '奖金红包', text: '奖金红包' },
+            { value: '转账充值', text: '转账充值' }
+          ]
+        }
+      ],
       // 表头
       fields: [
         {
           key: 'selected',
           label: '',
-          tdClass: 'align-middle',
+          tdClass: ['align-middle', 'border-top-0'],
           thClass: ['border-top-0', 'border-bottom']
         },
         {
           key: 'photo',
           label: '图片',
+          tdClass: 'border-top-0',
           thClass: ['border-top-0', 'border-bottom']
         },
         {
           key: 'method',
           label: '付款方式',
           sortable: true,
-          tdClass: 'align-middle',
+          tdClass: ['align-middle', 'border-top-0'],
           thClass: ['border-top-0', 'border-bottom']
         },
         {
           key: 'category',
           label: '账单分类',
-          tdClass: 'align-middle',
+          tdClass: ['align-middle', 'border-top-0'],
           thClass: ['border-top-0', 'border-bottom']
         },
         {
           key: 'description',
           label: '收支描述',
-          tdClass: ['text-truncate', 'align-middle'],
+          tdClass: ['text-truncate', 'align-middle', 'border-top-0'],
           thClass: ['border-top-0', 'border-bottom']
         },
         {
           key: 'expense',
           label: '支出',
           sortable: true,
-          tdClass: 'align-middle',
+          tdClass: ['align-middle', 'border-top-0'],
           thClass: ['border-top-0', 'border-bottom']
         },
         {
           key: 'income',
           label: '收入',
           sortable: true,
-          tdClass: 'align-middle',
+          tdClass: ['align-middle', 'border-top-0'],
           thClass: ['border-top-0', 'border-bottom']
         },
         {
           key: 'balance',
           label: '账户现金',
           sortable: true,
-          tdClass: 'align-middle',
+          tdClass: ['align-middle', 'border-top-0'],
           thClass: ['border-top-0', 'border-bottom']
         },
         {
           key: 'remark',
           label: '备注',
-          tdClass: ['text-truncate', 'align-middle'],
+          tdClass: ['text-truncate', 'align-middle', 'border-top-0'],
           thClass: ['border-top-0', 'border-bottom']
         },
         {
           key: 'actions',
           label: '操作',
-          tdClass: 'align-middle',
+          tdClass: ['align-middle', 'border-top-0'],
           thClass: ['border-top-0', 'border-bottom']
         }
       ],
@@ -403,7 +439,7 @@ export default {
         this.totalRows = data.totalCount
 
         const items = data.transactions.map((item) => {
-          item.modalShow = false
+          item.showDeleteModal = false
           return item
         })
 
@@ -419,11 +455,54 @@ export default {
         return []
       }
     },
-
     // 表格搜索
     async onSearch() {
-      if (this.filter) {
-        await getTransactionByCategory(this.filter)
+      try {
+        this.isTableBusy = true
+
+        if (this.filter) {
+          await getTransactionsByCategory(this.filter)
+        }
+      } catch (err) {
+        this.showAlert({
+          variant: 'danger',
+          message: '搜索失败'
+        })
+      } finally {
+        this.isTableBusy = false
+      }
+    },
+    // 表格导出
+    async onExport() {
+      try {
+        const result = await exportAllTransactions()
+        const { data: csvString } = result.data
+
+        this.downloadFile(csvString, 'my-csv.csv')
+      } catch (err) {
+        this.showAlert({
+          variant: 'danger',
+          message: '导出失败'
+        })
+      }
+    },
+    // 下载 CSV
+    downloadFile(csvString) {
+      const blob = new Blob([csvString])
+
+      if (window.navigator.msSaveOrOpenBlob)
+        // IE hack; see http://msdn.microsoft.com/en-us/library/ie/hh779016.aspx
+        window.navigator.msSaveBlob(
+          blob,
+          `data_${this.moment().format('YYYYMMDD')}.csv`
+        )
+      else {
+        const a = window.document.createElement('a')
+        a.href = window.URL.createObjectURL(blob, { type: 'text/plain' })
+        a.download = `table-list_${this.moment().format('YYYYMMDD')}.csv`
+        document.body.appendChild(a)
+        a.click() // IE: "Access is denied"; see: https://connect.microsoft.com/IE/feedback/details/797361/ie-10-treats-blob-url-as-cross-origin-and-denies-access
+        document.body.removeChild(a)
       }
     },
     // 表格刷新
@@ -523,7 +602,7 @@ export default {
       this.alertVariant = options.variant
       this.alertMessage = options.message
 
-      this.showAlert = true
+      this.showDismissibleAlert = true
     },
     showModal(item) {
       if (!item.target) {
@@ -588,6 +667,10 @@ export default {
   .form {
     padding-bottom: 1.25rem;
 
+    .input-group-search {
+      width: 200px;
+    }
+
     .btn-search,
     .btn-add,
     .btn-export {
@@ -601,12 +684,6 @@ export default {
   }
 
   .table {
-    &[aria-busy='true'] {
-      .loading {
-        margin-top: 1.25rem;
-      }
-    }
-
     .bi-pencil-square {
       &:hover {
         color: var(--info);

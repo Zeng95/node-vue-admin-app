@@ -1,3 +1,4 @@
+const { parse } = require('json2csv')
 const Transaction = require('../models/transaction')
 
 exports.getTransaction = async (req, res) => {
@@ -15,7 +16,9 @@ exports.getTransaction = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      transaction: foundTransaction
+      data: {
+        transaction: foundTransaction
+      }
     })
   } catch (err) {
     res.status(500).json({
@@ -25,12 +28,12 @@ exports.getTransaction = async (req, res) => {
   }
 }
 
-exports.getTransactionByCategory = async (req, res) => {
+exports.getTransactionsByCategory = async (req, res) => {
   try {
     // 通过 category 查询数据库
     // 异步操作
     const foundTransaction = await Transaction.find({
-      category: req.query.category
+      category: req.query.name
     })
 
     if (foundTransaction.length === 0) {
@@ -42,7 +45,9 @@ exports.getTransactionByCategory = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      transaction: foundTransaction
+      data: {
+        transaction: foundTransaction
+      }
     })
   } catch (err) {
     res.status(500).json({
@@ -80,6 +85,33 @@ exports.getAllTransactions = async (req, res) => {
         pageSize: pageLimit,
         totalCount: numOfTransactions
       }
+    })
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: err.message
+    })
+  }
+}
+
+exports.exportAllTransactions = async (req, res) => {
+  try {
+    // 查询数据库
+    // 异步操作
+    const foundTransactions = await Transaction.find()
+
+    if (!foundTransactions) {
+      return res.status(404).json({
+        success: false,
+        message: '交易记录不存在'
+      })
+    }
+
+    const csv = parse(foundTransactions)
+
+    res.status(200).json({
+      success: true,
+      data: csv
     })
   } catch (err) {
     res.status(500).json({
@@ -147,7 +179,8 @@ exports.deleteTransaction = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: '删除成功'
+      message: '删除成功',
+      data: true
     })
   } catch (err) {
     res.status(500).json({
@@ -159,7 +192,11 @@ exports.deleteTransaction = async (req, res) => {
 
 exports.deleteManyTransactions = async (req, res) => {
   try {
-    // await Transaction.deleteMany({})
+    const { ids } = req.body
+
+    await Transaction.deleteMany({
+      _id: { $in: ids }
+    })
 
     res.status(200).json({
       success: true,

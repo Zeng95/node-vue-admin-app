@@ -10,18 +10,29 @@ const {
 const { verifyToken } = require('../middlewares/verify-token')
 
 /**
- * 通过 category 获取交易记录
+ * 导出所有交易记录
  *
  * @access Private
  */
 router.get(
-  '/transactions/search',
+  '/transactions/export',
   verifyToken,
-  controller.getTransactionByCategory
+  controller.exportAllTransactions
 )
 
 /**
- * 通过 id 获取交易记录
+ * 通过 category 获取一条或多条交易记录
+ *
+ * @access Private
+ */
+router.get(
+  '/transactions/category',
+  verifyToken,
+  controller.getTransactionsByCategory
+)
+
+/**
+ * 通过 id 获取一条交易记录
  *
  * @access Private
  */

@@ -187,7 +187,7 @@ import {
   updateTransaction,
   deleteTransactionPhoto
 } from '@/api/transactions'
-import { required, numeric } from 'vuelidate/lib/validators'
+import { required, minValue } from 'vuelidate/lib/validators'
 
 export default {
   props: {
@@ -285,15 +285,15 @@ export default {
       },
       expense: {
         required,
-        numeric
+        minValue: minValue(0)
       },
       income: {
         required,
-        numeric
+        minValue: minValue(0)
       },
       balance: {
         required,
-        numeric
+        minValue: minValue(0)
       },
       remark: {}
     }
@@ -336,19 +336,20 @@ export default {
         await createTransaction(transaction)
 
         this.resetForm = true
+
         this.hideModal().then(() => {
           this.$emit('showAlert', {
             variant: 'success',
-            message: '新增成功'
+            message: '添加成功'
           })
 
-          this.$emit('refreshTable')
+          this.$emit('refresh')
         })
       } catch (error) {
         this.hideModal().then(() => {
           this.$emit('showAlert', {
             variant: 'danger',
-            message: '新增失败'
+            message: '添加失败'
           })
         })
       } finally {
@@ -386,7 +387,7 @@ export default {
             message: '修改成功'
           })
 
-          this.$emit('refreshTable')
+          this.$emit('refresh')
         })
       } catch (error) {
         this.hideModal().then(() => {

@@ -8,9 +8,9 @@ const getTransaction = (id) => {
   })
 }
 
-const getTransactionByCategory = (category) => {
-  return httpClient.get(`${END_POINT}/search`, {
-    params: { category }
+const getTransactionsByCategory = (category) => {
+  return httpClient.get(`${END_POINT}/category`, {
+    params: { name: category }
   })
 }
 
@@ -18,6 +18,10 @@ const getAllTransactions = (page, size) => {
   return httpClient.get(END_POINT, {
     params: { pageNumber: page, pageSize: size }
   })
+}
+
+const exportAllTransactions = () => {
+  return httpClient.get(`${END_POINT}/export`)
 }
 
 const createTransactionPhoto = (photo) => {
@@ -37,7 +41,9 @@ const deleteTransaction = (id) => {
 }
 
 const deleteManyTransactions = (ids) => {
-  return httpClient.delete(END_POINT, ids)
+  return httpClient.delete(END_POINT, {
+    data: { ids }
+  })
 }
 
 const deleteTransactionPhoto = (photo) => {
@@ -46,8 +52,9 @@ const deleteTransactionPhoto = (photo) => {
 
 export {
   getTransaction,
-  getTransactionByCategory,
+  getTransactionsByCategory,
   getAllTransactions,
+  exportAllTransactions,
   createTransactionPhoto,
   createTransaction,
   updateTransaction,

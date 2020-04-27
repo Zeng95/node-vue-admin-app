@@ -10,7 +10,7 @@
   >
     <div class="d-flex align-items-center">
       <b-icon-exclamation-circle-fill variant="warning" class="mr-3 text-xl" />
-      <span>确认要删除选中的交易记录吗?</span>
+      <span>您确定要删除选中的 {{ ids.length }} 条消息吗？</span>
     </div>
 
     <template v-slot:modal-footer>
@@ -18,12 +18,12 @@
         class="d-flex align-items-center"
         variant="info"
         :disabled="isBtnDisabled"
-        @click="handleDelete"
+        @click="onOk"
       >
         <b-spinner class="mr-1" small v-if="showSpinner"></b-spinner>
         <span>确认</span>
       </b-button>
-      <b-button variant="outline-danger" @click="hideModal()">
+      <b-button variant="outline-danger" @click="hideModal">
         <span>取消</span>
       </b-button>
     </template>
@@ -41,11 +41,9 @@ export default {
   props: {
     ids: {
       type: Array,
-      default: function () {
-        return []
-      }
+      required: true
     },
-    modalStatus: {
+    modalVisible: {
       type: Boolean,
       required: true
     }
@@ -53,36 +51,39 @@ export default {
   data() {
     return {
       isBtnDisabled: false,
-      showModal: this.modalStatus,
+      showModal: this.modalVisible,
       showSpinner: false
     }
   },
   watch: {
-    modalStatus(val) {
+    modalVisible(val) {
       this.showModal = val
     }
   },
   methods: {
-    async handleDelete() {
+    async onOk() {
       try {
         this.isBtnDisabled = true
         this.showSpinner = true
 
         if (this.ids.length === 1) {
-          await deleteTransaction(this.ids)
+          // 删除一条交易记录
+          await deleteTransaction(this.ids[0])
         } else {
+          // 删除多条交易记录
           await deleteManyTransactions(this.ids)
         }
 
-        this.$bvModal.hide()
+        this.hideModal()
 
-        this.handleShowAlert({
+        this.$emit('showAlert', {
           variant: 'success',
           message: '删除成功'
         })
-        this.handleRefresh()
+
+        this.$emit('refresh')
       } catch (err) {
-        this.handleShowAlert({
+        this.$emit('showAlert', {
           variant: 'danger',
           message: '删除失败'
         })
@@ -92,7 +93,7 @@ export default {
       }
     },
     hideModal() {
-      this.$emit('close')
+      this.$emit('hideModal')
     }
   }
 }
