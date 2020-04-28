@@ -194,14 +194,14 @@ export default {
     item: {
       type: Object,
       default: () => ({
+        photo: null,
         category: null,
         method: '',
         description: '',
         expense: 0,
         income: 0,
         balance: 0,
-        remark: null,
-        photo: null
+        remark: null
       })
     },
     isUpdate: {
@@ -216,11 +216,33 @@ export default {
     getPhotoUrl() {
       const { photo } = this.form
 
-      if (photo.url) {
-        return photo.url
-      } else {
-        return photo
-      }
+      return photo && photo.url ? photo.url : photo
+    }
+  },
+  validations: {
+    form: {
+      category: {
+        required
+      },
+      method: {
+        required
+      },
+      description: {
+        required
+      },
+      expense: {
+        required,
+        minValue: minValue(0)
+      },
+      income: {
+        required,
+        minValue: minValue(0)
+      },
+      balance: {
+        required,
+        minValue: minValue(0)
+      },
+      remark: {}
     }
   },
   data() {
@@ -229,7 +251,6 @@ export default {
         {
           label: '消费',
           options: [
-            { value: null, text: '账单分类' },
             { value: '餐饮美食', text: '餐饮美食' },
             { value: '服饰美容', text: '服饰美容' },
             { value: '生活日常', text: '生活日常' },
@@ -267,35 +288,7 @@ export default {
       showUploadSpinner: false,
 
       isDeleteDisabled: false,
-      showDeleteSpinner: false,
-
-      resetForm: false
-    }
-  },
-  validations: {
-    form: {
-      category: {
-        required
-      },
-      method: {
-        required
-      },
-      description: {
-        required
-      },
-      expense: {
-        required,
-        minValue: minValue(0)
-      },
-      income: {
-        required,
-        minValue: minValue(0)
-      },
-      balance: {
-        required,
-        minValue: minValue(0)
-      },
-      remark: {}
+      showDeleteSpinner: false
     }
   },
   watch: {
@@ -324,18 +317,16 @@ export default {
         this.showSubmitSpinner = true
 
         const transaction = {
+          photo: this.form.photo ? this.form.photo.url : '',
           category: this.form.category,
           method: this.form.method,
           description: this.form.description,
           expense: this.form.expense,
           income: this.form.income,
           balance: this.form.balance,
-          remark: this.form.remark,
-          photo: this.form.photo ? this.form.photo.url : ''
+          remark: this.form.remark
         }
         await createTransaction(transaction)
-
-        this.resetForm = true
 
         this.hideModal().then(() => {
           this.$emit('showAlert', {
@@ -369,14 +360,14 @@ export default {
 
         const transactionId = this.form._id
         const transaction = {
+          photo: this.form.photo ? this.form.photo.url : '',
           category: this.form.category,
           method: this.form.method,
           description: this.form.description,
           expense: this.form.expense,
           income: this.form.income,
           balance: this.form.balance,
-          remark: this.form.remark,
-          photo: this.form.photo ? this.form.photo.url : ''
+          remark: this.form.remark
         }
 
         await updateTransaction(transactionId, transaction)
@@ -460,27 +451,10 @@ export default {
 
         setTimeout(() => {
           this.$bvModal.hide('modal')
+          this.form = { ...this.item }
 
-          if (this.resetForm) {
-            // this.form = {
-            //   category: null,
-            //   method: '',
-            //   description: '',
-            //   expense: 0,
-            //   income: 0,
-            //   balance: 0,
-            //   remark: null,
-            //   photo: null
-            // }
-
-            this.form.category = null
-            this.resetForm = false
-          }
-
-          this.$nextTick(() => {
-            this.$v.$reset()
-            this.$v.form.$reset()
-          })
+          // 一定要用 setTimeout，不然 reset 会有问题
+          setTimeout(() => this.$v.$reset(), 0)
 
           resolve()
         }, 450)

@@ -21,8 +21,6 @@
             <!-- 搜索框 -->
             <b-input-group class="input-group-search">
               <b-form-select
-                trim
-                lazy
                 v-model="filter"
                 :options="categories"
               ></b-form-select>
@@ -45,12 +43,23 @@
             <!-- 批量删除 -->
             <b-button
               variant="info"
+              class="ml-0"
               :class="{ 'cursor-not-allowed': !allSelected }"
               :disabled="!allSelected"
               @click="showDeleteModal = true"
             >
               <span>批量删除</span>
             </b-button>
+
+            <!-- 列设置 -->
+            <b-dropdown no-caret variant="info">
+              <template v-slot:button-content>
+                <b-icon-funnel class="mr-1" />
+                <span>列设置</span>
+              </template>
+              <b-dropdown-item href="#">An item</b-dropdown-item>
+              <b-dropdown-item href="#">Another item</b-dropdown-item>
+            </b-dropdown>
 
             <!-- 添加 -->
             <b-button
@@ -131,10 +140,6 @@
 
           <template v-slot:cell(photo)="data">
             <b-img :src="data.item.photo" class="w-100"></b-img>
-          </template>
-
-          <template v-slot:cell(createdAt)="data">
-            {{ formatDate(data.value) }}
           </template>
 
           <template v-slot:cell(actions)="data">
@@ -240,6 +245,7 @@
 <script>
 import {
   BIconTrash,
+  BIconFunnel,
   BIconPencilSquare,
   BIconFileEarmarkPlus,
   BIconFileEarmarkText
@@ -260,6 +266,7 @@ export default {
     SaveModal,
     DeleteModal,
     BIconTrash,
+    BIconFunnel,
     BIconPencilSquare,
     BIconFileEarmarkPlus,
     BIconFileEarmarkText
@@ -281,7 +288,7 @@ export default {
         {
           label: '消费',
           options: [
-            { value: null, text: '账单分类' },
+            { value: null, text: '选择分类' },
             { value: '餐饮美食', text: '餐饮美食' },
             { value: '服饰美容', text: '服饰美容' },
             { value: '生活日常', text: '生活日常' },
@@ -614,45 +621,6 @@ export default {
       }
 
       this.$bvModal.show('modal')
-    },
-
-    formatDate(value) {
-      const date = new Date(value)
-
-      let year = date.getFullYear()
-      let month, day, hours, minutes, seconds
-
-      if (date.getMonth() < 10) {
-        month = `0${date.getMonth()}`
-      } else {
-        month = date.getMonth()
-      }
-
-      if (date.getDate() < 10) {
-        day = `0${date.getDate()}`
-      } else {
-        day = date.getDate()
-      }
-
-      if (date.getHours() < 10) {
-        hours = `0${date.getHours()}`
-      } else {
-        hours = date.getHours()
-      }
-
-      if (date.getMinutes() < 10) {
-        minutes = `0${date.getMinutes()}`
-      } else {
-        minutes = date.getMinutes()
-      }
-
-      if (date.getSeconds() < 10) {
-        seconds = `0${date.getSeconds()}`
-      } else {
-        seconds = date.getSeconds()
-      }
-
-      return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
     }
   }
 }
@@ -671,13 +639,14 @@ export default {
       width: 200px;
     }
 
-    .btn-search,
-    .btn-add,
-    .btn-export {
-      margin-left: 17.5px;
+    .filter-items {
+      & > .btn,
+      & > .dropdown {
+        margin-left: 17.5px;
+      }
     }
 
-    .bi-search {
+    .b-icon {
       width: 14px;
       height: 14px;
     }
