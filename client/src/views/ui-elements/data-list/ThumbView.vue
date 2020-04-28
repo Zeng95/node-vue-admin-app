@@ -52,13 +52,19 @@
             </b-button>
 
             <!-- 列设置 -->
-            <b-dropdown no-caret variant="info">
+            <b-dropdown no-caret no-flip right variant="info">
               <template v-slot:button-content>
                 <b-icon-funnel class="mr-1" />
                 <span>列设置</span>
               </template>
-              <b-dropdown-item href="#">An item</b-dropdown-item>
-              <b-dropdown-item href="#">Another item</b-dropdown-item>
+
+              <!-- 下拉菜单 -->
+              <b-dropdown-form>
+                <b-form-checkbox-group
+                  v-model="dropdownSelectedFields"
+                  :options="dropdownFields"
+                />
+              </b-dropdown-form>
             </b-dropdown>
 
             <!-- 添加 -->
@@ -85,7 +91,7 @@
 
           <!-- 删除 DeleteModal -->
           <DeleteModal
-            :ids="selectedItems"
+            :modals="selectedItems"
             :modalVisible="showDeleteModal"
             @refresh="onRefresh"
             @showAlert="showAlert"
@@ -125,12 +131,12 @@
           </template>
 
           <template v-slot:head(selected)>
-            <b-checkbox v-model="allSelected" @change="toggleAllRows" />
+            <b-form-checkbox v-model="allSelected" @change="toggleAllRows" />
           </template>
 
           <template v-slot:cell(selected)="data">
             <b-form-checkbox-group v-model="selectedItems" stacked>
-              <b-checkbox
+              <b-form-checkbox
                 :value="data.item._id"
                 class="mr-0"
                 @change="selectRow(data)"
@@ -158,7 +164,7 @@
 
               <!-- 删除 DeleteModal -->
               <DeleteModal
-                :ids="[data.item._id]"
+                :modals="[data.item]"
                 :modalVisible="data.item.showDeleteModal"
                 @refresh="onRefresh"
                 @showAlert="showAlert"
@@ -178,6 +184,7 @@
           <!-- 下拉菜单 -->
           <div class="pagination-size mx-3">
             <b-dropdown
+              dropup
               variant="transparent"
               menu-class="mb-0"
               offset="-28"
@@ -205,7 +212,7 @@
             page-class="mx-1"
             next-class="ml-1"
             class="mb-0"
-          ></b-pagination>
+          />
 
           <div class="pagination-jump ml-3 d-flex align-items-center">
             前往
@@ -279,6 +286,37 @@ export default {
   watch: {
     selectedItems(val) {
       this.allSelected = val.length > 0 ? true : false
+    },
+    dropdownSelectedFields(newVal, oldVal) {
+      // 移除表格头中的列
+      if (newVal.length < oldVal.length) {
+        const difference = oldVal.filter((item) => {
+          return newVal.indexOf(item) === -1
+        })
+
+        this.fields.forEach((item, index) => {
+          if (item.key === difference[0]) {
+            this.dropdownRemovedField.push(item)
+            // 替换空对象保持 fields 数组顺序不变
+            this.fields.splice(index, 1, {})
+          }
+        })
+      }
+
+      // 添加表格头中的列
+      if (newVal.length > oldVal.length) {
+        const difference = newVal.filter((item) => {
+          return oldVal.indexOf(item) === -1
+        })
+
+        this.dropdownRemovedField.forEach((item, index) => {
+          if (item.key === difference[0]) {
+            this.dropdownRemovedField.splice(index, 1)
+            // 替换原对象保持 fields 数组顺序不变
+            this.fields.splice(item.index, 1, item)
+          }
+        })
+      }
     }
   },
   data() {
@@ -328,60 +366,78 @@ export default {
         {
           key: 'photo',
           label: '图片',
+          headerTitle: '图片',
           tdClass: 'border-top-0',
-          thClass: ['border-top-0', 'border-bottom']
+          thClass: ['border-top-0', 'border-bottom'],
+          index: 1
         },
         {
           key: 'method',
           label: '付款方式',
-          sortable: true,
+          headerTitle: '付款方式',
           tdClass: ['align-middle', 'border-top-0'],
-          thClass: ['border-top-0', 'border-bottom']
+          thClass: ['border-top-0', 'border-bottom'],
+          index: 2,
+          sortable: true
         },
         {
           key: 'category',
           label: '账单分类',
+          headerTitle: '账单分类',
           tdClass: ['align-middle', 'border-top-0'],
-          thClass: ['border-top-0', 'border-bottom']
+          thClass: ['border-top-0', 'border-bottom'],
+          index: 3
         },
         {
           key: 'description',
           label: '收支描述',
+          headerTitle: '收支描述',
           tdClass: ['text-truncate', 'align-middle', 'border-top-0'],
-          thClass: ['border-top-0', 'border-bottom']
+          thClass: ['border-top-0', 'border-bottom'],
+          index: 4
         },
         {
           key: 'expense',
           label: '支出',
-          sortable: true,
+          headerTitle: '支出',
           tdClass: ['align-middle', 'border-top-0'],
-          thClass: ['border-top-0', 'border-bottom']
+          thClass: ['border-top-0', 'border-bottom'],
+          index: 5,
+          sortable: true
         },
         {
           key: 'income',
           label: '收入',
-          sortable: true,
+          headerTitle: '收入',
           tdClass: ['align-middle', 'border-top-0'],
-          thClass: ['border-top-0', 'border-bottom']
+          thClass: ['border-top-0', 'border-bottom'],
+          index: 6,
+          sortable: true
         },
         {
           key: 'balance',
           label: '账户现金',
-          sortable: true,
+          headerTitle: '账户现金',
           tdClass: ['align-middle', 'border-top-0'],
-          thClass: ['border-top-0', 'border-bottom']
+          thClass: ['border-top-0', 'border-bottom'],
+          index: 7,
+          sortable: true
         },
         {
           key: 'remark',
           label: '备注',
+          headerTitle: '备注',
           tdClass: ['text-truncate', 'align-middle', 'border-top-0'],
-          thClass: ['border-top-0', 'border-bottom']
+          thClass: ['border-top-0', 'border-bottom'],
+          index: 8
         },
         {
           key: 'actions',
           label: '操作',
+          headerTitle: '操作',
           tdClass: ['align-middle', 'border-top-0'],
-          thClass: ['border-top-0', 'border-bottom']
+          thClass: ['border-top-0', 'border-bottom'],
+          index: 9
         }
       ],
       tableItem: undefined,
@@ -434,6 +490,30 @@ export default {
         }
       ],
 
+      dropdownFields: [
+        { text: '图片', value: 'photo' },
+        { text: '付款方式', value: 'method' },
+        { text: '账单分类', value: 'category' },
+        { text: '收支描述', value: 'description' },
+        { text: '支出', value: 'expense' },
+        { text: '收入', value: 'income' },
+        { text: '账户现金', value: 'balance' },
+        { text: '备注', value: 'remark' },
+        { text: '操作', value: 'actions' }
+      ],
+      dropdownSelectedFields: [
+        'photo',
+        'method',
+        'category',
+        'description',
+        'expense',
+        'income',
+        'balance',
+        'remark',
+        'actions'
+      ],
+      dropdownRemovedField: [],
+
       showDeleteModal: false
     }
   },
@@ -462,6 +542,7 @@ export default {
         return []
       }
     },
+
     // 表格搜索
     async onSearch() {
       try {
@@ -521,6 +602,14 @@ export default {
         perPage: this.perPage
       })
     },
+    // 表格排序
+    onSortChanged() {
+      this.isTableBusy = true
+
+      setTimeout(() => {
+        this.isTableBusy = false
+      }, 500)
+    },
     // 表格行通过 Click 事件选中
     onRowSelected(items) {
       const selectedItemsLen = this.selectedItems.length
@@ -557,14 +646,6 @@ export default {
         this.allSelected = false
         this.selectedItems = []
       }
-    },
-    // 表格排序
-    onSortChanged() {
-      this.isTableBusy = true
-
-      setTimeout(() => {
-        this.isTableBusy = false
-      }, 500)
     },
     // 表格行通过 Checkbox 多选框选中
     selectRow(item) {

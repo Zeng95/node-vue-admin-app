@@ -75,7 +75,11 @@ router.put('/transactions/:id', verifyToken, controller.updateTransaction)
  *
  * @access Private
  */
-router.delete('/transactions/:id', verifyToken, controller.deleteTransaction)
+router.delete(
+  '/transactions/:id',
+  [verifyToken, DeletePhoto],
+  controller.deleteTransaction
+)
 
 /**
  * 删除多个交易记录

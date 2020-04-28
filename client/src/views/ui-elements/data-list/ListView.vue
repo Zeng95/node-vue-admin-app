@@ -54,13 +54,19 @@
             </b-button>
 
             <!-- 列设置 -->
-            <b-dropdown no-caret variant="info">
+            <b-dropdown no-caret no-flip right variant="info">
               <template v-slot:button-content>
                 <b-icon-funnel class="mr-1" />
                 <span>列设置</span>
               </template>
-              <b-dropdown-item href="#">An item</b-dropdown-item>
-              <b-dropdown-item href="#">Another item</b-dropdown-item>
+
+              <!-- 下拉菜单 -->
+              <b-dropdown-form>
+                <b-form-checkbox-group
+                  v-model="dropdownSelectedFields"
+                  :options="dropdownFields"
+                />
+              </b-dropdown-form>
             </b-dropdown>
 
             <!-- 添加 -->
@@ -180,6 +186,7 @@
           <!-- 下拉菜单 -->
           <div class="pagination-size mx-3">
             <b-dropdown
+              dropup
               variant="transparent"
               menu-class="mb-0"
               offset="-28"
@@ -281,6 +288,37 @@ export default {
   watch: {
     selectedItems(val) {
       this.allSelected = val.length > 0 ? true : false
+    },
+    dropdownSelectedFields(newVal, oldVal) {
+      // 移除表格头中的列
+      if (newVal.length < oldVal.length) {
+        const difference = oldVal.filter((item) => {
+          return newVal.indexOf(item) === -1
+        })
+
+        this.fields.forEach((item, index) => {
+          if (item.key === difference[0]) {
+            this.dropdownRemovedField.push(item)
+            // 替换空对象保持 fields 数组顺序不变
+            this.fields.splice(index, 1, {})
+          }
+        })
+      }
+
+      // 添加表格头中的列
+      if (newVal.length > oldVal.length) {
+        const difference = newVal.filter((item) => {
+          return oldVal.indexOf(item) === -1
+        })
+
+        this.dropdownRemovedField.forEach((item, index) => {
+          if (item.key === difference[0]) {
+            this.dropdownRemovedField.splice(index, 1)
+            // 替换原对象保持 fields 数组顺序不变
+            this.fields.splice(item.index, 1, item)
+          }
+        })
+      }
     }
   },
   data() {
@@ -290,7 +328,7 @@ export default {
         {
           label: '消费',
           options: [
-            { value: null, text: '账单分类' },
+            { value: null, text: '选择分类' },
             { value: '餐饮美食', text: '餐饮美食' },
             { value: '服饰美容', text: '服饰美容' },
             { value: '生活日常', text: '生活日常' },
@@ -330,61 +368,70 @@ export default {
         {
           key: 'method',
           label: '付款方式',
-          sortable: true,
           tdClass: ['align-middle', 'border-top-0'],
-          thClass: ['border-top-0', 'border-bottom']
+          thClass: ['border-top-0', 'border-bottom'],
+          index: 1,
+          sortable: true
         },
         {
           key: 'createdAt',
           label: '创建时间',
-          sortable: true,
           tdClass: ['align-middle', 'border-top-0'],
-          thClass: ['border-top-0', 'border-bottom']
+          thClass: ['border-top-0', 'border-bottom'],
+          index: 2,
+          sortable: true
         },
         {
           key: 'category',
           label: '账单分类',
           tdClass: ['align-middle', 'border-top-0'],
-          thClass: ['border-top-0', 'border-bottom']
+          thClass: ['border-top-0', 'border-bottom'],
+          index: 3
         },
         {
           key: 'description',
           label: '收支描述',
           tdClass: ['align-middle', 'border-top-0', 'text-truncate'],
-          thClass: ['border-top-0', 'border-bottom']
+          thClass: ['border-top-0', 'border-bottom'],
+          index: 4
         },
         {
           key: 'expense',
           label: '支出',
-          sortable: true,
           tdClass: ['align-middle', 'border-top-0'],
-          thClass: ['border-top-0', 'border-bottom']
+          thClass: ['border-top-0', 'border-bottom'],
+          index: 5,
+          sortable: true
         },
         {
           key: 'income',
           label: '收入',
-          sortable: true,
           tdClass: ['align-middle', 'border-top-0'],
-          thClass: ['border-top-0', 'border-bottom']
+          thClass: ['border-top-0', 'border-bottom'],
+          index: 6,
+          sortable: true
         },
         {
           key: 'balance',
           label: '账户现金',
-          sortable: true,
           tdClass: ['align-middle', 'border-top-0'],
-          thClass: ['border-top-0', 'border-bottom']
+          thClass: ['border-top-0', 'border-bottom'],
+          index: 7,
+          sortable: true
         },
         {
           key: 'remark',
           label: '备注',
           tdClass: ['align-middle', 'border-top-0', 'text-truncate'],
-          thClass: ['border-top-0', 'border-bottom']
+          thClass: ['border-top-0', 'border-bottom'],
+          index: 8
         },
         {
           key: 'actions',
           label: '操作',
           tdClass: ['align-middle', 'border-top-0'],
-          thClass: ['border-top-0', 'border-bottom']
+          thClass: ['border-top-0', 'border-bottom'],
+          index: 9
         }
       ],
       tableItem: undefined,
@@ -436,6 +483,30 @@ export default {
           isActive: false
         }
       ],
+
+      dropdownFields: [
+        { text: '付款方式', value: 'method' },
+        { text: '创建时间', value: 'createdAt' },
+        { text: '账单分类', value: 'category' },
+        { text: '收支描述', value: 'description' },
+        { text: '支出', value: 'expense' },
+        { text: '收入', value: 'income' },
+        { text: '账户现金', value: 'balance' },
+        { text: '备注', value: 'remark' },
+        { text: '操作', value: 'actions' }
+      ],
+      dropdownSelectedFields: [
+        'method',
+        'createdAt',
+        'category',
+        'description',
+        'expense',
+        'income',
+        'balance',
+        'remark',
+        'actions'
+      ],
+      dropdownRemovedField: [],
 
       showDeleteModal: false
     }
@@ -524,6 +595,14 @@ export default {
         perPage: this.perPage
       })
     },
+    // 表格排序
+    onSortChanged() {
+      this.isTableBusy = true
+
+      setTimeout(() => {
+        this.isTableBusy = false
+      }, 500)
+    },
     // 表格行通过 Click 事件选中
     onRowSelected(items) {
       const selectedItemsLen = this.selectedItems.length
@@ -560,14 +639,6 @@ export default {
         this.allSelected = false
         this.selectedItems = []
       }
-    },
-    // 表格排序
-    onSortChanged() {
-      this.isTableBusy = true
-
-      setTimeout(() => {
-        this.isTableBusy = false
-      }, 500)
     },
     // 表格行通过 Checkbox 多选框选中
     selectRow(item) {

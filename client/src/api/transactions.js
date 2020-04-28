@@ -36,8 +36,10 @@ const updateTransaction = (id, transaction) => {
   return httpClient.put(`${END_POINT}/${id}`, transaction)
 }
 
-const deleteTransaction = (id) => {
-  return httpClient.delete(`${END_POINT}/${id}`)
+const deleteTransaction = (id, filename) => {
+  return httpClient.delete(`${END_POINT}/${id}`, {
+    data: { filename }
+  })
 }
 
 const deleteManyTransactions = (ids) => {

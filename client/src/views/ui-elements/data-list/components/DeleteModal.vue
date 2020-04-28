@@ -10,7 +10,7 @@
   >
     <div class="d-flex align-items-center">
       <b-icon-exclamation-circle-fill variant="warning" class="mr-3 text-xl" />
-      <span>您确定要删除选中的 {{ ids.length }} 条消息吗？</span>
+      <span>您确定要删除选中的 {{ modals.length }} 条消息吗？</span>
     </div>
 
     <template v-slot:modal-footer>
@@ -39,7 +39,7 @@ export default {
     BIconExclamationCircleFill
   },
   props: {
-    ids: {
+    modals: {
       type: Array,
       required: true
     },
@@ -66,9 +66,12 @@ export default {
         this.isBtnDisabled = true
         this.showSpinner = true
 
-        if (this.ids.length === 1) {
+        if (this.modals.length === 1) {
+          const id = this.modals[0]._id
+          const photo = this.modals[0].photo
+          const filename = photo.substring(photo.lastIndexOf('/') + 1)
           // 删除一条交易记录
-          await deleteTransaction(this.ids[0])
+          await deleteTransaction(id, filename)
         } else {
           // 删除多条交易记录
           await deleteManyTransactions(this.ids)
