@@ -16,7 +16,6 @@
       <b-card-body>
         <!-- 表单 -->
         <b-form inline class="form">
-          <!-- 搜索 -->
           <div class="search-box">
             <!-- 搜索框 -->
             <b-input-group class="input-group-search">
@@ -38,7 +37,6 @@
             </b-input-group>
           </div>
 
-          <!-- 按钮操作 -->
           <div class="filter-items d-flex ml-auto">
             <!-- 批量删除 -->
             <b-button
@@ -91,7 +89,7 @@
 
           <!-- 删除 DeleteModal -->
           <DeleteModal
-            :modals="selectedItems"
+            :tableItems="selectedTableItems"
             :modalVisible="showDeleteModal"
             @refresh="onRefresh"
             @showAlert="showAlert"
@@ -164,7 +162,7 @@
 
               <!-- 删除 DeleteModal -->
               <DeleteModal
-                :modals="[data.item]"
+                :tableItems="[data.item]"
                 :modalVisible="data.item.showDeleteModal"
                 @refresh="onRefresh"
                 @showAlert="showAlert"
@@ -281,6 +279,11 @@ export default {
   computed: {
     numberOfPages() {
       return Math.ceil(this.totalRows / this.perPage)
+    },
+    selectedTableItems() {
+      return this.tableValues.filter((item) => {
+        return this.selectedItems.indexOf(item._id) !== -1
+      })
     }
   },
   watch: {

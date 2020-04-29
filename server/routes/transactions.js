@@ -5,7 +5,8 @@ const controller = require('../controllers/transactions')
 const {
   uploadSingle,
   uploadPhoto,
-  DeletePhoto
+  DeletePhoto,
+  DeletePhotos
 } = require('../middlewares/upload-photo')
 const { verifyToken } = require('../middlewares/verify-token')
 
@@ -86,14 +87,11 @@ router.delete(
  *
  * @access Private
  */
-router.delete('/transactions', verifyToken, controller.deleteManyTransactions)
-
-/**
- * 删除所有交易记录
- *
- * @access Private
- */
-router.delete('/transactions', verifyToken, controller.deleteAllTransactions)
+router.delete(
+  '/transactions',
+  [verifyToken, DeletePhotos],
+  controller.deleteManyTransactions
+)
 
 /**
  * 删除指定交易记录的图片

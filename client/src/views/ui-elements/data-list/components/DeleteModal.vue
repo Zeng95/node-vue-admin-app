@@ -10,7 +10,7 @@
   >
     <div class="d-flex align-items-center">
       <b-icon-exclamation-circle-fill variant="warning" class="mr-3 text-xl" />
-      <span>您确定要删除选中的 {{ modals.length }} 条消息吗？</span>
+      <span>您确定要删除选中的 {{ tableItems.length }} 条消息吗？</span>
     </div>
 
     <template v-slot:modal-footer>
@@ -39,7 +39,7 @@ export default {
     BIconExclamationCircleFill
   },
   props: {
-    modals: {
+    tableItems: {
       type: Array,
       required: true
     },
@@ -66,15 +66,20 @@ export default {
         this.isBtnDisabled = true
         this.showSpinner = true
 
-        if (this.modals.length === 1) {
-          const id = this.modals[0]._id
-          const photo = this.modals[0].photo
-          const filename = photo.substring(photo.lastIndexOf('/') + 1)
+        if (this.tableItems.length === 1) {
+          const id = this.tableItems[0]._id
+          const filename = this.getFilename(this.tableItems[0].photo)
+
           // 删除一条交易记录
           await deleteTransaction(id, filename)
         } else {
+          const ids = this.tableItems.map((item) => item._id)
+          const filenames = this.tableItems.map((item) =>
+            this.getFilename(item.photo)
+          )
+
           // 删除多条交易记录
-          await deleteManyTransactions(this.ids)
+          await deleteManyTransactions(ids, filenames)
         }
 
         this.hideModal()
@@ -97,6 +102,9 @@ export default {
     },
     hideModal() {
       this.$emit('hideModal')
+    },
+    getFilename(url) {
+      return url.substring(url.lastIndexOf('/') + 1)
     }
   }
 }

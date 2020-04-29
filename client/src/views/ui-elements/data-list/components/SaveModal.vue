@@ -421,9 +421,15 @@ export default {
         this.isDeleteDisabled = true
         this.showDeleteSpinner = true
 
-        await deleteTransactionPhoto({
-          data: { filename: this.form.photo.filename }
-        })
+        let filename
+
+        if (this.form.photo.filename) {
+          filename = this.form.photo.filename
+        } else {
+          filename = this.getFilename(this.form.photo)
+        }
+
+        await deleteTransactionPhoto(filename)
 
         this.$set(this.form, 'photo', null)
       } catch (err) {
@@ -463,6 +469,9 @@ export default {
     validateState(name) {
       const { $dirty, $error } = this.$v.form[name]
       return $dirty ? !$error : null
+    },
+    getFilename(url) {
+      return url.substring(url.lastIndexOf('/') + 1)
     }
   }
 }

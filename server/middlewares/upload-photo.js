@@ -7,7 +7,7 @@ const {
   APP_OSS_BUCKET
 } = process.env
 
-// Create A Bucket Instance
+// Create a bucket instance.
 const client = new OSS({
   region: APP_OSS_REGION,
   accessKeyId: APP_OSS_ACCESS_KEY_ID,
@@ -26,6 +26,7 @@ const storage = multer.diskStorage({
 
 const uploadSingle = multer({ storage })
 
+// Add an object to the bucket.
 const uploadPhoto = async (req, res, next) => {
   try {
     if (req.file) {
@@ -45,6 +46,7 @@ const uploadPhoto = async (req, res, next) => {
   }
 }
 
+// Delete an object from the bucket.
 const DeletePhoto = async (req, res, next) => {
   try {
     const name = `images/${req.body.filename}`
@@ -58,4 +60,20 @@ const DeletePhoto = async (req, res, next) => {
   }
 }
 
-module.exports = { uploadSingle, uploadPhoto, DeletePhoto }
+// Delete multi objects in one request.
+const DeletePhotos = async (req, res, next) => {
+  try {
+    const { filenames } = req.body
+    const names = filenames.map((item) => {
+      return `images/${item}`
+    })
+
+    await client.deleteMulti(names)
+
+    next()
+  } catch (err) {
+    console.error('error: %j', err)
+  }
+}
+
+module.exports = { uploadSingle, uploadPhoto, DeletePhoto, DeletePhotos }

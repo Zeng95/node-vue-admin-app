@@ -210,22 +210,6 @@ exports.deleteManyTransactions = async (req, res) => {
   }
 }
 
-exports.deleteAllTransactions = async (req, res) => {
-  try {
-    await Transaction.deleteMany({})
-
-    res.status(200).json({
-      success: true,
-      message: '删除成功'
-    })
-  } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: err.message
-    })
-  }
-}
-
 exports.deleteTransactionPhoto = (req, res) => {
   res.status(200).json({
     success: true,

@@ -93,7 +93,7 @@
 
           <!-- 删除 DeleteModal -->
           <DeleteModal
-            :ids="selectedItems"
+            :tableItems="selectedTableItems"
             :modalVisible="showDeleteModal"
             @refresh="onRefresh"
             @showAlert="showAlert"
@@ -166,7 +166,7 @@
 
               <!-- 删除 DeleteModal -->
               <DeleteModal
-                :ids="[data.item._id]"
+                :tableItems="[data.item]"
                 :modalVisible="data.item.showDeleteModal"
                 @refresh="onRefresh"
                 @showAlert="showAlert"
@@ -283,6 +283,11 @@ export default {
   computed: {
     numberOfPages() {
       return Math.ceil(this.totalRows / this.perPage)
+    },
+    selectedTableItems() {
+      return this.tableValues.filter((item) => {
+        return this.selectedItems.indexOf(item._id) !== -1
+      })
     }
   },
   watch: {
